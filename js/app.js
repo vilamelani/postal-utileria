@@ -153,8 +153,26 @@
     phone.classList.toggle('no-chrome', !!chromeState.hidden);
     phone.classList.toggle('real-sb', !fakeSBVisible());
     renderSB(chromeState.lock);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = chromeState.hidden || chromeState.overlay ? '#000000' : (S.theme === 'dark' ? '#000000' : '#ffffff');
+    syncTopColor();
+  }
+
+  /* Color de fondo "detrás" de la barra de estado real (iPhone).
+     iOS pinta su barra con el color de la página, así que lo sincronizamos
+     con la pantalla que se está mostrando: blanco en la app clara,
+     negro en la oscura / pantalla bloqueada, marrón en las pantallas de equipo. */
+  const desktopPreview = matchMedia('(min-width: 640px) and (pointer: fine)');
+  function topColor() {
+    if (chromeState.crew) return '#1c1311';
+    if (chromeState.hidden || chromeState.overlay || chromeState.lock) return '#000000';
+    return S.theme === 'dark' ? '#000000' : '#ffffff';
+  }
+  function syncTopColor() {
+    const c = topColor();
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = c; });
+    if (!desktopPreview.matches) {
+      document.documentElement.style.backgroundColor = c;
+      document.body.style.backgroundColor = c;
+    }
   }
   setInterval(() => { if (S.clockMode !== 'fixed') { renderSB(chromeState.lock); const t = $('.lk-time'); if (t) t.textContent = timeStr(); } }, 10000);
 
@@ -181,7 +199,7 @@
      Menú de escenas (equipo)
      ======================================================================= */
   function renderMenu() {
-    applyChrome({ tone: 'light', hidden: true });
+    applyChrome({ tone: 'light', hidden: true, crew: true });
     const inst = isStandalone();
     const off = navigator.serviceWorker && navigator.serviceWorker.controller;
     screen.innerHTML = `
@@ -428,7 +446,7 @@
   function render9H() {
     const st = R.sub['9H'];
     if (st === 'arm') {
-      applyChrome({ tone: 'light', hidden: true });
+      applyChrome({ tone: 'light', hidden: true, crew: true });
       const c = S.s9H;
       const trig = { timer: `Arranca sola a los ${c.delay} s`, tap: 'Arranca al tocar la pantalla', both: `Arranca a los ${c.delay} s o antes si se toca la pantalla` }[c.trigger];
       screen.innerHTML = `
@@ -683,6 +701,10 @@
         ${row('Foto de la publicación', `<span style="display:flex;gap:8px;align-items:center">${thumb('post')}<div class="seg"><button type="button" data-act="pick" data-key="post">Cambiar</button><button type="button" data-act="unpick" data-key="post">Original</button></div></span>`)}
         ${row('Fondo pantalla bloqueada', `<span style="display:flex;gap:8px;align-items:center">${thumb('wallpaper')}<div class="seg"><button type="button" data-act="pick" data-key="wallpaper">Cambiar</button><button type="button" data-act="unpick" data-key="wallpaper">Original</button></div></span>`)}
       </div>
+      <div class="sh-sec">Al abrir la app</div>
+      <div class="sh-card">
+        ${row('Abrir directo en', seg('launchScene', [['menu', 'Menú'], ['7E', '7E'], ['7G', '7G'], ['9H', '9H']]), 'Cerrá la app del todo y volvé a abrirla desde el ícono')}
+      </div>
       <button type="button" class="sh-wide" data-act="fullscreen">Pantalla completa</button>
       <button type="button" class="sh-wide" data-act="menu">Ir al menú de escenas</button>
       <button type="button" class="sh-wide" data-act="reset-all">${resetConfirm ? 'Tocá de nuevo para borrar todos los ajustes' : 'Restablecer todos los ajustes'}</button>
@@ -797,6 +819,13 @@
      ======================================================================= */
   document.title = S.appName;
   route = fromHash();
+  // "Abrir directo en": sólo al abrir la app desde el ícono (una vez por arranque)
+  let launched = false;
+  try { launched = sessionStorage.getItem('guita.launched') === '1'; sessionStorage.setItem('guita.launched', '1'); } catch (e) { /* nada */ }
+  if (!launched && route === 'menu' && S.launchScene && S.launchScene !== 'menu' && ROUTES.includes(S.launchScene)) {
+    route = S.launchScene;
+    try { history.replaceState(null, '', '#' + route); } catch (e) { /* nada */ }
+  }
   render();
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

@@ -1,6 +1,6 @@
 /* Guarda toda la app en el celular para que funcione sin conexión.
    Si se cambia algún archivo, subir el número de versión para que los celulares se actualicen. */
-const VERSION = 'guita-ep1-v1';
+const VERSION = 'guita-ep1-v2';
 const ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/app.css', 'js/config.js', 'js/app.js',

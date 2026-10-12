@@ -23,6 +23,7 @@ window.GUITA_DEFAULTS = {
   signal: 4,               // 0 a 4 rayitas
   wifi: true,
   autoFullscreen: true,    // en Android pide pantalla completa al primer toque
+  launchScene: 'menu',     // 'menu' | '7E' | '7G' | '9H' : dónde abre la app al tocar el ícono
 
   // Cuenta de la marca
   account: {

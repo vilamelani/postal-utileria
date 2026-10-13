@@ -23,7 +23,7 @@ window.GUITA_DEFAULTS = {
   signal: 4,               // 0 a 4 rayitas
   wifi: true,
   autoFullscreen: true,    // en Android pide pantalla completa al primer toque
-  launchScene: 'menu',     // 'menu' | '7E' | '7G' | '9H' : dónde abre la app al tocar el ícono
+  launchScene: 'menu',     // 'menu' o una escena ('7E', '29', '38'...): dónde abre la app al tocar el ícono
 
   // Cuenta de la marca
   account: {
@@ -60,6 +60,52 @@ window.GUITA_DEFAULTS = {
     minInterval: 0.35,     // ritmo máximo cuando se acelera
     accelerate: true,
     vibrate: 'continuous'  // 'continuous' | 'each' | 'off'
+  },
+
+  /* ===================== EPISODIO 2 y 3 ===================== */
+
+  // Cuenta de Mica (influencer)
+  mica: {
+    username: 'micarr',
+    fullName: 'Mica R.',
+    bio: 'Skincare · Lifestyle · GRWM ✨\nBuenos Aires 📍\nCódigo MICARR7 💖',   // [INVENTADO] (el código sale del guion)
+    link: 'micarr.com.ar',                                                   // [INVENTADO]
+    posts: 214,                                                              // [INVENTADO]
+    following: 845,
+    highlights: ['Rutina', 'Mi bebé', 'Eventos', 'Canjes', 'Detrás'],        // [INVENTADO]
+    mutuals: 'sofi.glow, cami.makeup y 312 más siguen esta cuenta'          // [INVENTADO] (lo ve María Laura en la 29)
+  },
+  // Cuenta de María Laura (sólo se ve su foto en la barra de abajo)
+  mlaura: { username: 'mlaura.rep' },
+
+  // Esc 15 · Ariel mira un video de skincare
+  s15: { caption: 'Mi rutina de skincare de noche 🌙✨', likes: '12,4 mil', comments: '348', shares: '1.203' },   // [INVENTADO]
+
+  // Esc 21 · Notificación "Micar ha publicado un nuevo video" → al tocarla se abre el reel
+  s21: {
+    start: 'lock', trigger: 'both', delay: 6,
+    text: '{u} ha publicado un nuevo video',
+    caption: 'Un día conmigo ☀️ ¿Les muestro más? 👀', likes: '8.932', comments: '201', shares: '644'          // [INVENTADO]
+  },
+
+  // Esc 29B/29D · María Laura muestra el perfil de Mica: cada refresh pasa al siguiente número
+  s29: { steps: [15030, 20070, 30020] },
+
+  // Esc 38 · Perfil propio de Mica → "+" → EN VIVO → iniciar transmisión
+  s38: { followers: 41800, askCameraOnEnter: true },                       // seguidores: [INVENTADO]
+
+  // Esc 39 · Notificación de vivo en el celular de María Laura
+  s39: { start: 'lock', trigger: 'both', delay: 5, text: '{u} está transmitiendo en VIVO' },
+
+  // Esc 40 · El vivo (también se llega desde la 38)
+  s40: {
+    viewersStart: 140,
+    viewersTarget: 15000,
+    rampSec: 10,            // segundos para llegar de 140 a 15.000
+    phase2At: 20,           // a los X segundos cambian los comentarios (horror). 0 = sólo a mano
+    phase3At: 0,            // a los X segundos llegan los comentarios de apoyo (esc 42). 0 = sólo a mano
+    viewersPhase3: 45000,   // fase 3: el contador sube hasta acá
+    startMuted: false
   },
 
   refreshMs: 900           // cuánto gira la ruedita del pull-to-refresh
@@ -99,3 +145,20 @@ window.GUITA_NOTIFS = [
   { type: 'follow', user: 'pili.ferrari' },
   { type: 'dm', user: 'gaby.mate', text: '¿Me reservás dos para el sábado?' }
 ];
+
+/* Comentarios del vivo (esc 40 y 42). Los primeros de cada fase son los del guion,
+   en ese orden; después se mezclan con los [INVENTADO]. */
+window.GUITA_LIVE = {
+  phase1: ['¡Llegó el día!', '¡Holisss!', '¡Queremos ver el cambio!', '¡Fin del reto!', '¡Mica te queremos ver!',
+    'holaaa 😍', 'llegué!!', '¿Cómo te quedó la piel?', 'yo también hice el reto 🙋‍♀️', 'muéstranos!!', 'te amo Mica', 'la reina 👑',
+    'hola desde Córdoba!', 'ya me compré la crema', 'quiero ver el antes y después', '🔥🔥🔥', '😍😍', '¿y el código?', 'día 7!!!'],
+  phase2: ['¿Qué te pasó?', '¿Qué tenés en la cara?', 'Es joda, ¿no?', '¿¿¿???', 'WTF???', '¿Te quemó?', 'Denuncien a la marca', 'Dios mío, qué horror',
+    'noooo 😱', 'es un filtro?', 'Mica estás bien??', 'andá al médico por favor', 'yo la estoy usando 😰', 'qué es eso', '😨😨', 'no puede ser', 'devuelvan la plata'],
+  phase3: ['Al fin alguien que se muestra tal cual es', 'Te bancamos, Mica', 'Mica, sos lo más', 'Aguante mostrarse real', 'Yendo a prender fuego a la marca',
+    'La más auténtica', 'Qué ovarios para mostrarte así', 'Al fin alguien real', 'Aguante Mica', 'Basta de filtros', 'Cancelemos ya a la marca',
+    '❤️❤️❤️', 'te queremos!!', 'gracias por mostrarlo', '👏👏👏', 'sos enorme', 'real > filtro'],
+  users: ['sofi.glow', 'cami.makeup', 'luu.martinez', 'agus.skin', 'flor_bsas', 'meli.rios', 'juli.ferraro', 'dani_beauty', 'rochi.ok', 'pili.mendez',
+    'valen.sz', 'brenda.lux', 'maca_ok', 'nati.gomez', 'tini.fan22', 'abril.rm', 'lara.vidal', 'mora_paz', 'emi.acosta', 'clara.nuñez',
+    'ro.benitez', 'ailu.cs', 'jaz.quiroga', 'ceci_luna', 'tomi.rey', 'marti.k', 'bel.ortiz', 'yami.ok', 'guada.p', 'sol.mansilla',
+    'cande.vera', 'mili_fit', 'ines.dl', 'pau.rossi', 'mica.fan.club', 'lucre.ss', 'vicky.cano', 'oriana_m', 'eli.bazan', 'kari.mt']
+};

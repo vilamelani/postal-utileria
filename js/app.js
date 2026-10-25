@@ -460,7 +460,7 @@
       };
     }
     const m = S.mica;
-    const grid = MICA_GRID.slice(0, 3).concat(extraGrid, MICA_GRID.slice(3));
+    const grid = MICA_GRID.slice(0, 1).concat(extraGrid, MICA_GRID.slice(1));
     return {
       own: id === '38', username: m.username, fullName: m.fullName, bio: m.bio, link: m.link,
       avatar: img('micaAvatar'), navAvatar: id === '38' ? img('micaAvatar') : img('mlAvatar'),

@@ -4,7 +4,7 @@
    Gestos ocultos:
      · Mantener apretada ~1 s la esquina SUPERIOR IZQUIERDA → menú oculto
      · Doble toque en la esquina INFERIOR DERECHA → avanzar contador (perfiles)
-     · Pantallas bloqueadas (9H, 21, 36, 39): tocar la pantalla → dispara la notificación
+     · Pantallas bloqueadas (9H, 21, 36, 39, 41): tocar la pantalla → dispara la notificación
    ========================================================================= */
 (() => {
   'use strict';
@@ -118,6 +118,7 @@
     { id: '36', ep: 3, title: 'Mensaje de la marca', who: 'Celular de María Laura', desc: () => `Plano detalle. Pantalla bloqueada → mensaje de ${S.s36.sender}: “${S.s36.text}”.` },
     { id: '38', ep: 3, title: 'Prepara el vivo', who: 'Celular de Mica', desc: () => 'Perfil → “+” → EN VIVO con la cámara frontal → iniciar transmisión. Sigue como la 40.' },
     { id: '39', ep: 3, title: 'Notificación del vivo', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → “${fillU(S.s39.text)}”.` },
+    { id: '41', ep: 3, title: 'La marca llama', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → llamada entrante de ${S.s41.caller} (no la atiende). Suena ${S.s41.calls} veces.` },
     { id: '43', ep: 3, title: 'María Laura mira el vivo', who: 'Celular de María Laura', desc: () => `Ve el vivo de @${S.mica.username} como espectadora (video cargado desde el menú oculto). Arranca en ${fmtNum(S.s43.viewersStart)} y sube; comentarios de apoyo.` },
     { id: '40', ep: 3, title: 'El vivo', who: 'Celular de Mica', desc: () => `Arranca directo en vivo. Espectadores ${fmtNum(S.s40.viewersStart)} → ${fmtNum(S.s40.viewersTarget)} en ${S.s40.rampSec} s; los comentarios cambian a los ${S.s40.phase2At} s.` }
   ];
@@ -140,6 +141,7 @@
     tagged: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4.5"/><circle cx="12" cy="10.2" r="3"/><path d="M6.6 19.5a6 6 0 0 1 10.8 0"/></svg>',
     camera: '<svg viewBox="0 0 24 24"><path d="M3.5 8h3.4l1.8-2.8h6.6L17.1 8h3.4v11.3h-17z"/><circle cx="12" cy="13.2" r="3.6"/></svg>',
     plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+    handset: '<svg viewBox="0 0 24 24"><path d="M6.7 3.2 9.4 3l1.6 4.1-2 1.5a11.3 11.3 0 0 0 6.4 6.4l1.5-2 4.1 1.6-.2 2.7a2.3 2.3 0 0 1-2.3 2.1A16.4 16.4 0 0 1 3.7 5.5a2.3 2.3 0 0 1 3-2.3z"/></svg>',
     padlock: '<svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>',
     torch: '<svg viewBox="0 0 24 24"><path d="M8 3h8v4l-2 3v11h-4V10L8 7z"/><path d="M12 13v2"/></svg>',
     cam: '<svg viewBox="0 0 24 24"><path d="M3.5 8h3.4l1.8-2.8h6.6L17.1 8h3.4v11.3h-17z"/><circle cx="12" cy="13.2" r="3.4"/></svg>',
@@ -171,6 +173,7 @@
     clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>'
   };
   const appIcon = (cls = '') => `<span class="app-icon ${cls}"><b>${esc((S.appName || 'P').trim().charAt(0).toUpperCase())}</b></span>`;
+  const phoneIcon = (cls = '') => `<span class="app-icon phone-ic ${cls}">${I.handset}</span>`;
   /* ícono de una app de chat genérica (globo de diálogo, sin parecerse a WhatsApp) */
   const chatIcon = (cls = '') => `<span class="app-icon chat-ic ${cls}"><svg viewBox="0 0 24 24"><path d="M12 3.6c-4.7 0-8.4 3.1-8.4 7.2 0 2.2 1.1 4.2 2.9 5.5L5.6 20.4l4.2-2c.7.2 1.4.3 2.2.3 4.7 0 8.4-3.1 8.4-7.2S16.7 3.6 12 3.6z" fill="#fff"/><circle cx="8.6" cy="10.9" r="1.1" class="d"/><circle cx="12" cy="10.9" r="1.1" class="d"/><circle cx="15.4" cy="10.9" r="1.1" class="d"/></svg></span>`;
 
@@ -278,7 +281,7 @@
   }
   function resetTransient() {
     stopFeed(); stopLive();
-    ['9H', '21', '36', '39'].forEach((id) => { R.sub[id] = 'arm'; });
+    ['9H', '21', '36', '39', '41'].forEach((id) => { R.sub[id] = 'arm'; });
     R.sub['38'] = 'profile'; R.sub['40'] = 'live';
   }
   window.addEventListener('hashchange', () => {
@@ -296,7 +299,7 @@
       case 'menu': return renderMenu();
       case '7E': return render7E();
       case '7G': return renderProfile('7G');
-      case '9H': case '21': case '36': case '39': return renderLockScene(route);
+      case '9H': case '21': case '36': case '39': case '41': return renderLockScene(route);
       case '15': return renderReel('15');
       case '29': return renderProfile('29');
       case '38': return render38();
@@ -304,7 +307,7 @@
       case '43': return renderViewer43();
     }
   }
-  const isBusy = () => (['9H', '21', '36', '39'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40' || route === '43';
+  const isBusy = () => (['9H', '21', '36', '39', '41'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40' || route === '43';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -331,7 +334,7 @@
             <li><b>Refresh:</b> deslizar el perfil hacia abajo. Cada refresh pasa al número siguiente.</li>
             <li><b>Avanzar sin deslizar:</b> doble toque en la esquina <b>inferior derecha</b>.</li>
             <li><b>Reiniciar la toma:</b> menú oculto → “Reiniciar escena”.</li>
-            <li><b>Pantallas bloqueadas (9H, 21, 36, 39):</b> tocar <b>Armar</b>. Arranca con el temporizador o al tocar la pantalla.</li>
+            <li><b>Pantallas bloqueadas (9H, 21, 36, 39, 41):</b> tocar <b>Armar</b>. Arranca con el temporizador o al tocar la pantalla.</li>
             <li><b>Cámara (38, 40):</b> la primera vez el celular pide permiso: aceptarlo antes de grabar.</li>
           </ul>
         </div>
@@ -591,6 +594,8 @@
       armTitle: 'Micar publicó un video', notif: () => ({ title: esc(S.appName), body: esc(fillU(S.s21.text)), tap: true }) },
     '36': { cfg: () => S.s36, start: () => S.s36.start, stream: false,
       armTitle: 'Mensaje de la marca', notif: () => ({ title: esc(S.s36.sender), body: esc(S.s36.text), dm: true, chat: true, label: esc(S.s36.appLabel) }) },
+    '41': { cfg: () => S.s41, start: () => S.s41.start, stream: false,
+      armTitle: 'La marca llama a María Laura' },
     '39': { cfg: () => S.s39, start: () => S.s39.start, stream: false,
       armTitle: 'Notificación del vivo', notif: () => ({ title: esc(S.appName), body: esc(fillU(S.s39.text)) }) }
   };
@@ -601,13 +606,15 @@
     const L = LOCK[id];
     const c = L.cfg();
     const st = R.sub[id] || 'arm';
+    if (id === '41' && st === 'on') return renderCall41();
     if (st === 'arm') {
       applyChrome({ tone: 'light', hidden: true, crew: true });
       const trig = { timer: `Arranca sola a los ${c.delay} s`, tap: 'Arranca al tocar la pantalla', both: `Arranca a los ${c.delay} s o antes si se toca la pantalla` }[c.trigger];
       const startTxt = L.start() === 'off' ? 'La pantalla queda negra (parece apagada)' : 'Queda la pantalla bloqueada encendida';
       const extra = id === '9H'
         ? `Notificaciones cada ${c.interval} s${c.accelerate ? ', cada vez más rápido' : ''}.`
-        : id === '21' ? 'Al tocar la notificación se abre el reel.' : '';
+        : id === '21' ? 'Al tocar la notificación se abre el reel.'
+        : id === '41' ? `Después suena ${c.calls} veces (${c.ringSec} s cada una) y queda “llamada perdida”.` : '';
       screen.innerHTML = `
         <div class="crew">
           <div class="kicker">Escena ${id}</div>
@@ -663,6 +670,7 @@
   function fireLock(id) {
     if (route !== id || R.sub[id] === 'on') return;
     clearTimers();
+    if (id === '41') { startCalls(); return; }
     const wasBlack = !$('#lkList');
     R.sub[id] = 'on';
     if (wasBlack) render();
@@ -681,6 +689,71 @@
         if (canVibrate) { try { navigator.vibrate([220, 90, 220]); } catch (e) { /* nada */ } }
       }, wasBlack ? 350 : 60);
     }
+  }
+
+  /* ---------- Esc 41: llamada entrante de la marca (no la atiende) ---------- */
+  const CALL = { n: 0, missed: 0, phase: 'ring' };
+  function startCalls() {
+    stopFeed();
+    R.sub['41'] = 'on'; CALL.n = 0; CALL.missed = 0;
+    ringNow();
+  }
+  function ringNow() {
+    if (route !== '41' || R.sub['41'] !== 'on') return;
+    CALL.n++; CALL.phase = 'ring';
+    render();
+    startRingVibration();
+    later(endRing, Math.max(2, +S.s41.ringSec || 9) * 1000);
+  }
+  function endRing() {
+    if (route !== '41' || R.sub['41'] !== 'on') return;
+    stopVibration();
+    CALL.missed++; CALL.phase = 'missed';
+    render();
+    if (CALL.n < (+S.s41.calls || 1)) later(ringNow, Math.max(1, +S.s41.gapSec || 5) * 1000);
+  }
+  function startRingVibration() {
+    stopVibration();
+    if (!canVibrate || !S.s41.vibrate) return;
+    const pulse = () => { try { navigator.vibrate([900, 600, 900, 600, 900]); } catch (e) { /* nada */ } };
+    pulse();
+    vibTimer = setInterval(pulse, 4200);
+  }
+  function renderCall41() {
+    const c = S.s41;
+    if (CALL.phase === 'missed') {
+      applyChrome({ tone: 'light', lock: true, overlay: fakeSBVisible() });
+      const wall = img('wallpaper');
+      screen.innerHTML = `
+        <div class="lock ${wall ? '' : 'default-wall'}" ${wall ? `style="background-image:url('${wall}')"` : ''}>
+          <div class="lk-head">
+            <div class="lk-padlock">${I.padlock}</div>
+            <div class="lk-date">${esc(cap(dateStr()))}</div>
+            <div class="lk-time">${timeStr()}</div>
+          </div>
+          <div class="lk-list" id="lkList"></div>
+          <div class="lk-bottom">${S.platform === 'ios' ? `<i>${I.torch}</i><i>${I.cam}</i>` : `<i>${I.finger}</i>`}</div>
+        </div>`;
+      pushNotif($('#lkList'), { title: esc(c.caller), body: CALL.missed > 1 ? `${CALL.missed} llamadas perdidas` : 'Llamada perdida', dm: true, phone: true, label: 'Teléfono' });
+      return;
+    }
+    applyChrome({ tone: 'light', hidden: false, overlay: fakeSBVisible(), dark: true });
+    const wall = img('wallpaper');
+    const ios = S.platform === 'ios';
+    screen.innerHTML = `
+      <div class="call ${ios ? 'call-ios' : 'call-and'} ${wall ? '' : 'default-wall'}" ${wall ? `style="background-image:url('${wall}')"` : ''}>
+        <div class="call-shade"></div>
+        <div class="call-who">
+          ${ios ? '' : `<span class="call-av">${esc((c.caller || '?').trim().charAt(0).toUpperCase())}</span>`}
+          <b>${esc(c.caller)}</b>
+          <small>${ios ? esc(c.subtitle) : 'Llamada entrante · ' + esc(c.subtitle)}</small>
+        </div>
+        ${ios ? `<div class="call-mini"><span><i>${I.bell}</i>Recordarme</span><span><i>${I.bubble}</i>Mensaje</span></div>` : ''}
+        <div class="call-btns">
+          <span class="cb"><i class="red">${I.handset}</i>${ios ? '<em>Rechazar</em>' : ''}</span>
+          <span class="cb"><i class="green">${I.handset}</i>${ios ? '<em>Aceptar</em>' : ''}</span>
+        </div>
+      </div>`;
   }
 
   function tickNotif() {
@@ -704,10 +777,10 @@
     const el = document.createElement('div');
     if (S.platform === 'ios') {
       el.className = 'nt nt-ios';
-      el.innerHTML = `${t.chat ? chatIcon('md') : appIcon('md')}<div class="nt-main"><div class="nt-row"><span class="nt-title">${t.title}</span><span class="nt-time">ahora</span></div><div class="nt-text">${t.body}</div></div>`;
+      el.innerHTML = `${t.phone ? phoneIcon('md') : t.chat ? chatIcon('md') : appIcon('md')}<div class="nt-main"><div class="nt-row"><span class="nt-title">${t.title}</span><span class="nt-time">ahora</span></div><div class="nt-text">${t.body}</div></div>`;
     } else {
       el.className = 'nt nt-and';
-      el.innerHTML = `<div class="nt-head">${t.chat ? chatIcon('sm') : appIcon('sm')}<span>${t.chat ? t.label : esc(S.appName)}</span><span>· ahora</span></div>${t.dm ? `<div class="nt-title">${t.title}</div>` : ''}<div class="nt-text">${t.body}</div>`;
+      el.innerHTML = `<div class="nt-head">${t.phone ? phoneIcon('sm') : t.chat ? chatIcon('sm') : appIcon('sm')}<span>${t.chat || t.phone ? t.label : esc(S.appName)}</span><span>· ahora</span></div>${t.dm ? `<div class="nt-title">${t.title}</div>` : ''}<div class="nt-text">${t.body}</div>`;
     }
     list.prepend(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
@@ -1144,7 +1217,7 @@
           ${r !== '29' ? row('Publicaciones', txt(`${k}.posts`, 'number', 'min="0" max="9"')) + row('Seguidos', txt(`${k}.following`, 'number', 'min="0"')) + row('Mostrar biografía', seg(`${k}.showBio`, [[true, 'Sí'], [false, 'No']])) : ''}
         </div>`;
     }
-    if (r === '9H' || r === '21' || r === '36' || r === '39') {
+    if (r === '9H' || r === '21' || r === '36' || r === '39' || r === '41') {
       const k = 's' + r;
       return `
         <div class="sh-sec">Escena ${r}</div>
@@ -1155,7 +1228,8 @@
           ${trigRow(k)}
           ${r === '9H' ? row('Intervalo inicial (seg)', txt('s9H.interval', 'number', 'min="0.2" step="0.1"')) + row('Acelerar', seg('s9H.accelerate', [[true, 'Sí'], [false, 'No']])) + row('Vibración', seg('s9H.vibrate', [['continuous', 'Continua'], ['each', 'Por notif.'], ['off', 'No']]), canVibrate ? '' : 'Este celular no permite vibrar desde la app') : ''}
           ${r === '36' ? row('Nombre del remitente', txt('s36.sender')) + row('Nombre de la app de chat', txt('s36.appLabel'), 'Se ve en Android') : ''}
-          ${r !== '9H' ? row('Texto', txt(`${k}.text`), r === '36' ? '' : '{u} = usuario de Mica') : ''}
+          ${r === '41' ? row('Quién llama', txt('s41.caller')) + row('Debajo del nombre', txt('s41.subtitle'), 'En iPhone: “móvil”') + row('Veces que suena', txt('s41.calls', 'number', 'min="1" max="5"')) + row('Segundos sonando', txt('s41.ringSec', 'number', 'min="2"')) + row('Pausa entre llamadas (seg)', txt('s41.gapSec', 'number', 'min="1"')) + row('Vibración', seg('s41.vibrate', [[true, 'Sí'], [false, 'No']]), canVibrate ? '' : 'Este celular no permite vibrar desde la app') : ''}
+          ${r !== '9H' && r !== '41' ? row('Texto', txt(`${k}.text`), r === '36' ? '' : '{u} = usuario de Mica') : ''}
           ${r === '21' ? vidRow('Video del reel', 'reel21') : ''}
         </div>`;
     }
@@ -1209,7 +1283,7 @@
 
   function renderSheet() {
     const extras = store.get('guita.micaExtra', []).length;
-    const ep3 = ['15', '21', '29', '36', '38', '39', '40', '43'].includes(route);
+    const ep3 = ['15', '21', '29', '36', '38', '39', '40', '41', '43'].includes(route);
     const contentLR = `
         ${row('Usuario', txt('account.username'))}
         ${row('Nombre', txt('account.fullName'))}

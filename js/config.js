@@ -111,6 +111,9 @@ window.GUITA_DEFAULTS = {
     startMuted: false
   },
 
+  // Esc 41 · La marca llama a María Laura (llamada entrante que no atiende; suena dos veces)
+  s41: { start: 'lock', trigger: 'both', delay: 5, caller: '7Days', subtitle: 'móvil', ringSec: 9, gapSec: 5, calls: 2, vibrate: true },
+
   // Esc 43 · María Laura mira el vivo de Mica como espectadora (video cargado desde el menú oculto)
   s43: {
     viewersStart: 45200,    // el contador ya viene arriba de los 45.000 y sigue subiendo
@@ -161,9 +164,9 @@ window.GUITA_NOTIFS = [
 window.GUITA_LIVE = {
   // Escritos "a lo bruto", como tipea la gente: sin signo de apertura de admiración y con algún error de tipeo suelto
   phase1: ['Llegó el dia!', 'Holisss!', 'Queremos ver el cmabio!', 'Fin del reto!', 'Mica te queremos ver!',
-    'holaaa 😍', 'llegué!!', '¿Cómo te quedó la piel?', 'yo tambien hice el reto 🙋‍♀️', 'muéstranos!!', 'te amo Mica', 'la reina 👑',
-    'hola desde Córdoba!', 'ya me compre la crema', 'quiero ver el antes y después', '🔥🔥🔥', '😍😍', '¿y el código?', 'día 7!!!'],
-  phase2: ['¿Qué te pasó?', '¿Qué tenes en la cara?', 'Es joda, ¿no?', '¿¿¿???', 'WTF???', '¿Te quemo?', 'Denuncien a la marca', 'Dios mio, qué horror',
+    'holaaa 😍', 'llegué!!', 'Cómo te quedó la piel?', 'yo tambien hice el reto 🙋‍♀️', 'muéstranos!!', 'te amo Mica', 'la reina 👑',
+    'hola desde Córdoba!', 'ya me compre la crema', 'quiero ver el antes y después', '🔥🔥🔥', '😍😍', 'y el código?', 'día 7!!!'],
+  phase2: ['Qué te pasó?', 'Qué tenes en la cara?', 'Es joda, no?', '???', 'WTF???', 'Te quemo?', 'Denuncien a la marca', 'Dios mio, qué horror',
     'noooo 😱', 'es un filtro?', 'Mica estas bien??', 'andá al médico por favor', 'yo la estoy usnado 😰', 'qué es eso', '😨😨', 'no puede ser', 'devuelvan la plata'],
   phase3: ['Al fin alguien que se muetsra tal cual es', 'Te bancamos, Mica', 'Mica, sos lo mas', 'Aguante mostrarse real', 'Yendo a prender fuego a la marca',
     'La más auténtica', 'Que ovarios para mostrarte así', 'Al fin alguien real', 'Aguante Mica', 'Basta de filtros', 'Cancelemos ya a la marca',

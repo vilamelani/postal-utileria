@@ -4,7 +4,7 @@
    Gestos ocultos:
      · Mantener apretada ~1 s la esquina SUPERIOR IZQUIERDA → menú oculto
      · Doble toque en la esquina INFERIOR DERECHA → avanzar contador (perfiles)
-     · Pantallas bloqueadas (9H, 21, 39): tocar la pantalla → dispara la notificación
+     · Pantallas bloqueadas (9H, 21, 36, 39): tocar la pantalla → dispara la notificación
    ========================================================================= */
 (() => {
   'use strict';
@@ -115,6 +115,7 @@
     { id: '15', ep: 2, title: 'Video de skincare', who: 'Celular de Ariel', desc: () => 'Reel de una influencer en pantalla completa. Ariel bloquea el celular con el botón.' },
     { id: '21', ep: 2, title: 'Micar publicó un video', who: 'Celular de Ariel', desc: () => 'Pantalla bloqueada → llega la notificación → al tocarla se abre el reel.' },
     { id: '29', ep: 3, title: 'Aumento de seguidores', who: 'Celular de María Laura', desc: () => `Perfil de @${S.mica.username}. Refresh: ${S.s29.steps.map(fmtNum).join(' → ')}.` },
+    { id: '36', ep: 3, title: 'Mensaje de la marca', who: 'Celular de María Laura', desc: () => `Plano detalle. Pantalla bloqueada → mensaje de ${S.s36.sender}: “${S.s36.text}”.` },
     { id: '38', ep: 3, title: 'Prepara el vivo', who: 'Celular de Mica', desc: () => 'Perfil → “+” → EN VIVO con la cámara frontal → iniciar transmisión. Sigue como la 40.' },
     { id: '39', ep: 3, title: 'Notificación del vivo', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → “${fillU(S.s39.text)}”.` },
     { id: '40', ep: 3, title: 'El vivo', who: 'Celular de Mica', desc: () => `Arranca directo en vivo. Espectadores ${fmtNum(S.s40.viewersStart)} → ${fmtNum(S.s40.viewersTarget)} en ${S.s40.rampSec} s; los comentarios cambian a los ${S.s40.phase2At} s.` }
@@ -169,6 +170,8 @@
     clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>'
   };
   const appIcon = (cls = '') => `<span class="app-icon ${cls}"><b>${esc((S.appName || 'P').trim().charAt(0).toUpperCase())}</b></span>`;
+  /* ícono de una app de chat genérica (globo de diálogo, sin parecerse a WhatsApp) */
+  const chatIcon = (cls = '') => `<span class="app-icon chat-ic ${cls}"><svg viewBox="0 0 24 24"><path d="M12 3.6c-4.7 0-8.4 3.1-8.4 7.2 0 2.2 1.1 4.2 2.9 5.5L5.6 20.4l4.2-2c.7.2 1.4.3 2.2.3 4.7 0 8.4-3.1 8.4-7.2S16.7 3.6 12 3.6z" fill="#fff"/><circle cx="8.6" cy="10.9" r="1.1" class="d"/><circle cx="12" cy="10.9" r="1.1" class="d"/><circle cx="15.4" cy="10.9" r="1.1" class="d"/></svg></span>`;
 
   /* ---------- barra de estado ---------- */
   function sigSVG() {
@@ -274,7 +277,7 @@
   }
   function resetTransient() {
     stopFeed(); stopLive();
-    ['9H', '21', '39'].forEach((id) => { R.sub[id] = 'arm'; });
+    ['9H', '21', '36', '39'].forEach((id) => { R.sub[id] = 'arm'; });
     R.sub['38'] = 'profile'; R.sub['40'] = 'live';
   }
   window.addEventListener('hashchange', () => {
@@ -292,14 +295,14 @@
       case 'menu': return renderMenu();
       case '7E': return render7E();
       case '7G': return renderProfile('7G');
-      case '9H': case '21': case '39': return renderLockScene(route);
+      case '9H': case '21': case '36': case '39': return renderLockScene(route);
       case '15': return renderReel('15');
       case '29': return renderProfile('29');
       case '38': return render38();
       case '40': return renderLive('40');
     }
   }
-  const isBusy = () => (['9H', '21', '39'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40';
+  const isBusy = () => (['9H', '21', '36', '39'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -326,7 +329,7 @@
             <li><b>Refresh:</b> deslizar el perfil hacia abajo. Cada refresh pasa al número siguiente.</li>
             <li><b>Avanzar sin deslizar:</b> doble toque en la esquina <b>inferior derecha</b>.</li>
             <li><b>Reiniciar la toma:</b> menú oculto → “Reiniciar escena”.</li>
-            <li><b>Pantallas bloqueadas (9H, 21, 39):</b> tocar <b>Armar</b>. Arranca con el temporizador o al tocar la pantalla.</li>
+            <li><b>Pantallas bloqueadas (9H, 21, 36, 39):</b> tocar <b>Armar</b>. Arranca con el temporizador o al tocar la pantalla.</li>
             <li><b>Cámara (38, 40):</b> la primera vez el celular pide permiso: aceptarlo antes de grabar.</li>
           </ul>
         </div>
@@ -584,6 +587,8 @@
       armTitle: 'Lluvia de notificaciones' },
     '21': { cfg: () => S.s21, start: () => S.s21.start, stream: false,
       armTitle: 'Micar publicó un video', notif: () => ({ title: esc(S.appName), body: esc(fillU(S.s21.text)), tap: true }) },
+    '36': { cfg: () => S.s36, start: () => S.s36.start, stream: false,
+      armTitle: 'Mensaje de la marca', notif: () => ({ title: esc(S.s36.sender), body: esc(S.s36.text), dm: true, chat: true, label: esc(S.s36.appLabel) }) },
     '39': { cfg: () => S.s39, start: () => S.s39.start, stream: false,
       armTitle: 'Notificación del vivo', notif: () => ({ title: esc(S.appName), body: esc(fillU(S.s39.text)) }) }
   };
@@ -697,10 +702,10 @@
     const el = document.createElement('div');
     if (S.platform === 'ios') {
       el.className = 'nt nt-ios';
-      el.innerHTML = `${appIcon('md')}<div class="nt-main"><div class="nt-row"><span class="nt-title">${t.title}</span><span class="nt-time">ahora</span></div><div class="nt-text">${t.body}</div></div>`;
+      el.innerHTML = `${t.chat ? chatIcon('md') : appIcon('md')}<div class="nt-main"><div class="nt-row"><span class="nt-title">${t.title}</span><span class="nt-time">ahora</span></div><div class="nt-text">${t.body}</div></div>`;
     } else {
       el.className = 'nt nt-and';
-      el.innerHTML = `<div class="nt-head">${appIcon('sm')}<span>${esc(S.appName)}</span><span>· ahora</span></div>${t.dm ? `<div class="nt-title">${t.title}</div>` : ''}<div class="nt-text">${t.body}</div>`;
+      el.innerHTML = `<div class="nt-head">${t.chat ? chatIcon('sm') : appIcon('sm')}<span>${t.chat ? t.label : esc(S.appName)}</span><span>· ahora</span></div>${t.dm ? `<div class="nt-title">${t.title}</div>` : ''}<div class="nt-text">${t.body}</div>`;
     }
     list.prepend(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
@@ -1095,7 +1100,7 @@
           ${r !== '29' ? row('Publicaciones', txt(`${k}.posts`, 'number', 'min="0" max="9"')) + row('Seguidos', txt(`${k}.following`, 'number', 'min="0"')) + row('Mostrar biografía', seg(`${k}.showBio`, [[true, 'Sí'], [false, 'No']])) : ''}
         </div>`;
     }
-    if (r === '9H' || r === '21' || r === '39') {
+    if (r === '9H' || r === '21' || r === '36' || r === '39') {
       const k = 's' + r;
       return `
         <div class="sh-sec">Escena ${r}</div>
@@ -1105,7 +1110,8 @@
           ${r !== '9H' ? row('Pantalla al inicio', seg(`${k}.start`, [['lock', 'Bloqueada'], ['off', 'Apagada']])) : ''}
           ${trigRow(k)}
           ${r === '9H' ? row('Intervalo inicial (seg)', txt('s9H.interval', 'number', 'min="0.2" step="0.1"')) + row('Acelerar', seg('s9H.accelerate', [[true, 'Sí'], [false, 'No']])) + row('Vibración', seg('s9H.vibrate', [['continuous', 'Continua'], ['each', 'Por notif.'], ['off', 'No']]), canVibrate ? '' : 'Este celular no permite vibrar desde la app') : ''}
-          ${r !== '9H' ? row('Texto', txt(`${k}.text`), '{u} = usuario de Mica') : ''}
+          ${r === '36' ? row('Nombre del remitente', txt('s36.sender')) + row('Nombre de la app de chat', txt('s36.appLabel'), 'Se ve en Android') : ''}
+          ${r !== '9H' ? row('Texto', txt(`${k}.text`), r === '36' ? '' : '{u} = usuario de Mica') : ''}
           ${r === '21' ? vidRow('Video del reel', 'reel21') : ''}
         </div>`;
     }
@@ -1146,7 +1152,7 @@
 
   function renderSheet() {
     const extras = store.get('guita.micaExtra', []).length;
-    const ep3 = ['15', '21', '29', '38', '39', '40'].includes(route);
+    const ep3 = ['15', '21', '29', '36', '38', '39', '40'].includes(route);
     const contentLR = `
         ${row('Usuario', txt('account.username'))}
         ${row('Nombre', txt('account.fullName'))}

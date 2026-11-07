@@ -306,6 +306,11 @@ svg { display: block; }
 .nt-and .nt-title { font-weight: 500; font-size: 15px; }
 .nt-and .nt-text { font-size: 14px; color: #4b3e3a; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .nt-and .app-icon.sm { width: 20px; height: 20px; font-size: 9px; }
+/* ícono de la app de chat genérica (esc 36): turquesa, globo de diálogo con tres puntitos */
+.chat-ic { background: linear-gradient(160deg, #35d0c0, #0e8d9d); }
+.chat-ic svg { width: 62%; height: 62%; stroke: none; fill: none; }
+.chat-ic svg .d { fill: #0e8d9d; }
+.app-icon.sm.chat-ic { border-radius: 50%; }
 
 /* =========================================================================
    PANTALLAS DE EQUIPO (menú de escenas, armado, menú oculto)

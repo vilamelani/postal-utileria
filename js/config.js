@@ -91,6 +91,9 @@ window.GUITA_DEFAULTS = {
   // Esc 29B/29D · María Laura muestra el perfil de Mica: cada refresh pasa al siguiente número
   s29: { steps: [15030, 20070, 30020] },
 
+  // Esc 36 · Plano detalle del celular de María Laura: llega un mensaje de la marca (app de chat genérica, sin logo de WhatsApp)
+  s36: { start: 'lock', trigger: 'both', delay: 5, sender: '7Days', appLabel: 'Chat', text: 'Hola María Laura, en diez minutos tenemos el vivo' },
+
   // Esc 38 · Perfil propio de Mica → "+" → EN VIVO → iniciar transmisión
   s38: { followers: 41800, askCameraOnEnter: true },                       // seguidores: [INVENTADO]
 

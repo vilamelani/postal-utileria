@@ -506,6 +506,11 @@ video.mirror.nomirror { transform: none; }
 .lv-mutechip { display: grid; place-items: center; background: rgba(0,0,0,.42); border-radius: 6px; width: 28px; height: 24px; }
 .lv-mutechip[hidden] { display: none; }
 .lv-mutechip svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
+.lv-viewer .lv-top { gap: 9px; }
+.lv-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #FC8565; flex: 0 0 auto; }
+.lv-who { font-weight: 700; font-size: 14.5px; text-shadow: 0 1px 2px rgba(0,0,0,.5); max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-viewer .lv-badge { font-size: 11px; padding: 3px 7px; }
+.lv-viewer .lv-count { font-size: 12.5px; padding: 3px 7px; }
 .lv-x { margin-left: auto; width: 36px; height: 36px; display: grid; place-items: center; }
 .lv-x svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
 .lv-list {

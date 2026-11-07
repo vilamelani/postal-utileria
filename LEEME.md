@@ -26,9 +26,10 @@ Es una web app: se abre en el navegador del celular, se instala en la pantalla d
 | **36** | María Laura | Plano detalle. Pantalla bloqueada → llega un mensaje de **7Days**: “Hola María Laura, en diez minutos tenemos el vivo” (ícono de una app de chat genérica, no WhatsApp). **ARMAR**; llega por temporizador (5 s) o toque |
 | **38** | Mica | Su perfil → "+" → cámara frontal espejada → modo **EN VIVO** (tocar o deslizar) → botón central → "Iniciando video en vivo…" → sigue como la 40 |
 | **39** | María Laura | Pantalla bloqueada → "micarr está transmitiendo en VIVO" (temporizador o toque) |
+| **43** | María Laura | Ve el vivo de Mica como espectadora: el video que se cargue, contador desde 45.200 subiendo, comentarios de apoyo y corazones. Arranca solo al entrar. Video: menú oculto → "Cargar video" (desde la galería) |
 | **40** | Mica | Arranca directo en vivo: espectadores 140 → 15.000 en 10 s; a los 20 s los comentarios pasan a horror. Fase 3 (apoyo, esc. 42) desde el menú oculto. Botón de micrófono para silenciar |
 
-Videos: en el menú oculto de la 15 y la 21 → "Cargar video" (desde la galería). Mientras tanto se ve un video provisorio que dice "VIDEO PROVISORIO".
+Videos: en el menú oculto de la 15, la 21 y la 43 → "Cargar video" (desde la galería). Mientras tanto se ve un video provisorio que dice "VIDEO PROVISORIO".
 Fotos extra del perfil de Mica: menú oculto → "Fotos extra en el perfil de Mica" → Agregar.
 Cámara: la primera vez el celular pide permiso. En la 38 se pide al entrar a la escena para que no aparezca en medio de la toma. Si se rechazó: Ajustes del celular → Safari/Chrome → Cámara → Permitir.
 

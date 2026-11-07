@@ -97,7 +97,7 @@
     { src: 'img/mica/p07.jpg', icon: 'reel' }, { src: 'img/mica/p08.jpg', icon: null }, { src: 'img/mica/p09.jpg', icon: 'reel' }
   ];
   const MICA_HL = ['img/mica/hl1.jpg', 'img/mica/hl2.jpg', 'img/mica/hl3.jpg', 'img/mica/hl4.jpg', 'img/mica/hl5.jpg'];
-  const VIDEO_DEFAULT = { reel15: 'video/reel-skincare.mp4', reel21: 'video/reel-micar.mp4' };
+  const VIDEO_DEFAULT = { reel15: 'video/reel-skincare.mp4', reel21: 'video/reel-micar.mp4', live43: 'video/reel-micar.mp4' };
 
   const phone = $('#phone');
   const sbEl = $('#sb');
@@ -118,6 +118,7 @@
     { id: '36', ep: 3, title: 'Mensaje de la marca', who: 'Celular de María Laura', desc: () => `Plano detalle. Pantalla bloqueada → mensaje de ${S.s36.sender}: “${S.s36.text}”.` },
     { id: '38', ep: 3, title: 'Prepara el vivo', who: 'Celular de Mica', desc: () => 'Perfil → “+” → EN VIVO con la cámara frontal → iniciar transmisión. Sigue como la 40.' },
     { id: '39', ep: 3, title: 'Notificación del vivo', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → “${fillU(S.s39.text)}”.` },
+    { id: '43', ep: 3, title: 'María Laura mira el vivo', who: 'Celular de María Laura', desc: () => `Ve el vivo de @${S.mica.username} como espectadora (video cargado desde el menú oculto). Arranca en ${fmtNum(S.s43.viewersStart)} y sube; comentarios de apoyo.` },
     { id: '40', ep: 3, title: 'El vivo', who: 'Celular de Mica', desc: () => `Arranca directo en vivo. Espectadores ${fmtNum(S.s40.viewersStart)} → ${fmtNum(S.s40.viewersTarget)} en ${S.s40.rampSec} s; los comentarios cambian a los ${S.s40.phase2At} s.` }
   ];
   const sceneById = (id) => SCENES.find((s) => s.id === id);
@@ -300,9 +301,10 @@
       case '29': return renderProfile('29');
       case '38': return render38();
       case '40': return renderLive('40');
+      case '43': return renderViewer43();
     }
   }
-  const isBusy = () => (['9H', '21', '36', '39'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40';
+  const isBusy = () => (['9H', '21', '36', '39'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40' || route === '43';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -909,16 +911,57 @@
     startLive();
   }
 
+  /* Esc 43: María Laura mira el vivo de Mica como espectadora */
+  function renderViewer43() {
+    applyChrome({ tone: 'light', overlay: fakeSBVisible(), dark: true });
+    screen.innerHTML = `
+      <div class="lv lv-viewer">
+        <video id="lvVid" playsinline muted loop autoplay preload="auto"></video>
+        <div class="lv-shade"></div>
+        <div class="lv-top">
+          <img class="lv-av" src="${img('micaAvatar')}" alt="">
+          <b class="lv-who">${esc(S.mica.username)}</b>
+          <span class="lv-badge">EN VIVO</span>
+          <span class="lv-count">${I.eye}<b id="lvCount">${fmtNum(S.s43.viewersStart)}</b></span>
+          <span class="lv-x">${I.close}</span>
+        </div>
+        <div class="lv-list" id="lvList"></div>
+        <div class="lv-hearts" id="lvHearts"></div>
+        <div class="lv-bar">
+          <span class="lv-input">Agregá un comentario…</span>
+          <span class="lv-ic">${I.heart}</span>
+          <span class="lv-ic">${I.send}</span>
+        </div>
+      </div>`;
+    const v = $('#lvVid');
+    blobURL('video.live43').then((u) => {
+      if (!v.isConnected) return;
+      v.src = u || VIDEO_DEFAULT.live43;
+      v.play().catch(() => { /* se reproduce al primer toque */ });
+    });
+    screen.querySelector('.lv').addEventListener('click', () => { if (!suppressClick && v.paused) v.play().catch(() => {}); });
+    startLive({ viewer: true });
+  }
+
   function setMute(m) {
     LV.muted = m;
     const b = $('#lvMic'); if (b) { b.innerHTML = m ? I.micOff : I.mic; b.classList.toggle('is-muted', m); }
     const c = $('#lvMuteChip'); if (c) c.hidden = !m;
   }
 
-  function startLive() {
+  function startLive(opts) {
     stopLive();
-    const c = S.s40;
-    LV.running = true; LV.t0 = performance.now(); LV.phase = 1; LV.viewers = +c.viewersStart || 0; LV.used = { 1: 0, 2: 0, 3: 0 };
+    const viewer = !!(opts && opts.viewer);
+    const c = viewer ? S.s43 : S.s40;
+    LV.viewer = viewer; LV.p3t0 = 0;
+    LV.running = true; LV.t0 = performance.now(); LV.phase = viewer ? (+c.phase || 3) : 1; LV.viewers = +c.viewersStart || 0; LV.used = { 1: 0, 2: 0, 3: 0 };
+    if (viewer) {
+      viewersTick();
+      loop(commentTick, 500);
+      loop(heartTick, 400);
+      burstHearts(12);
+      return;
+    }
     setMute(!!c.startMuted);
     viewersTick();
     loop(commentTick, 700);
@@ -929,7 +972,7 @@
 
   function setPhase(p) {
     if (!LV.running) return;
-    if (p === 3) {
+    if (p === 3 && !LV.viewer) {
       LV.p3t0 = performance.now(); LV.p3v0 = LV.viewers;
       LV.phase = 0; // el chat se detiene un segundo
       setTimeout(() => { if (LV.running) { LV.phase = 3; burstHearts(16); } }, 1100);
@@ -938,6 +981,7 @@
   }
 
   function viewersTarget() {
+    if (LV.viewer) return (+S.s43.viewersStart || 0) + ((performance.now() - LV.t0) / 1000) * (+S.s43.perSec || 0);
     const c = S.s40;
     const t = (performance.now() - LV.t0) / 1000;
     const a = +c.viewersStart || 0, b = +c.viewersTarget || 0, T = Math.max(0.5, +c.rampSec || 10);
@@ -1126,6 +1170,19 @@
           <button type="button" class="sh-wide hot" data-act="reset-scene">Reiniciar escena</button>
         </div>`;
     }
+    if (r === '43') {
+      return `
+        <div class="sh-sec">Escena 43 · vivo visto por María Laura</div>
+        <div class="sh-card">
+          <div class="sh-big-num">${fmtNum(LV.viewers)}<small>espectadores · fase ${LV.phase} de comentarios</small></div>
+          <div class="sh-btns"><button type="button" data-act="phase1">Fase 1 · llegada</button><button type="button" data-act="phase2">Fase 2 · horror</button></div>
+          <div class="sh-btns"><button type="button" data-act="phase3">Fase 3 · apoyo</button><button type="button" class="hot" data-act="reset-scene">Reiniciar el vivo</button></div>
+          ${vidRow('Video del vivo de Mica', 'live43')}
+          ${row('Espectadores al inicio', txt('s43.viewersStart', 'number', 'min="0"'))}
+          ${row('Suben por segundo', txt('s43.perSec', 'number', 'min="0"'))}
+          ${row('Comentarios al inicio', seg('s43.phase', [[3, 'Apoyo'], [2, 'Horror'], [1, 'Llegada']]))}
+        </div>`;
+    }
     if (r === '38' || r === '40') {
       const inLive = r === '40' || R.sub['38'] === 'live';
       return `
@@ -1152,7 +1209,7 @@
 
   function renderSheet() {
     const extras = store.get('guita.micaExtra', []).length;
-    const ep3 = ['15', '21', '29', '36', '38', '39', '40'].includes(route);
+    const ep3 = ['15', '21', '29', '36', '38', '39', '40', '43'].includes(route);
     const contentLR = `
         ${row('Usuario', txt('account.username'))}
         ${row('Nombre', txt('account.fullName'))}
@@ -1347,7 +1404,11 @@
       const ok = await idb.set('video.' + slot, f);
       forgetBlob('video.' + slot);
       if (ok) { store.set('guita.vidname.' + slot, f.name || 'video'); toast('Video guardado'); } else toast('No se pudo guardar el video (¿muy pesado?)');
-      if (!isBusy()) render(); renderSheet();
+      if (slot === 'live43' && route === '43') {
+        const v = $('#lvVid'); const u = await blobURL('video.live43');
+        if (v && u) { v.src = u; v.play().catch(() => {}); }
+      } else if (!isBusy()) render();
+      renderSheet();
     });
   }
 

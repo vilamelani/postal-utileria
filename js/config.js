@@ -111,6 +111,13 @@ window.GUITA_DEFAULTS = {
     startMuted: false
   },
 
+  // Esc 43 · María Laura mira el vivo de Mica como espectadora (video cargado desde el menú oculto)
+  s43: {
+    viewersStart: 45200,    // el contador ya viene arriba de los 45.000 y sigue subiendo
+    perSec: 110,            // cuántos espectadores suma por segundo
+    phase: 3                // comentarios: 3 = apoyo (guion), 2 = horror, 1 = llegada
+  },
+
   refreshMs: 900           // cuánto gira la ruedita del pull-to-refresh
 };
 
@@ -152,14 +159,15 @@ window.GUITA_NOTIFS = [
 /* Comentarios del vivo (esc 40 y 42). Los primeros de cada fase son los del guion,
    en ese orden; después se mezclan con los [INVENTADO]. */
 window.GUITA_LIVE = {
-  phase1: ['¡Llegó el día!', '¡Holisss!', '¡Queremos ver el cambio!', '¡Fin del reto!', '¡Mica te queremos ver!',
-    'holaaa 😍', 'llegué!!', '¿Cómo te quedó la piel?', 'yo también hice el reto 🙋‍♀️', 'muéstranos!!', 'te amo Mica', 'la reina 👑',
-    'hola desde Córdoba!', 'ya me compré la crema', 'quiero ver el antes y después', '🔥🔥🔥', '😍😍', '¿y el código?', 'día 7!!!'],
-  phase2: ['¿Qué te pasó?', '¿Qué tenés en la cara?', 'Es joda, ¿no?', '¿¿¿???', 'WTF???', '¿Te quemó?', 'Denuncien a la marca', 'Dios mío, qué horror',
-    'noooo 😱', 'es un filtro?', 'Mica estás bien??', 'andá al médico por favor', 'yo la estoy usando 😰', 'qué es eso', '😨😨', 'no puede ser', 'devuelvan la plata'],
-  phase3: ['Al fin alguien que se muestra tal cual es', 'Te bancamos, Mica', 'Mica, sos lo más', 'Aguante mostrarse real', 'Yendo a prender fuego a la marca',
-    'La más auténtica', 'Qué ovarios para mostrarte así', 'Al fin alguien real', 'Aguante Mica', 'Basta de filtros', 'Cancelemos ya a la marca',
-    '❤️❤️❤️', 'te queremos!!', 'gracias por mostrarlo', '👏👏👏', 'sos enorme', 'real > filtro'],
+  // Escritos "a lo bruto", como tipea la gente: sin signo de apertura de admiración y con algún error de tipeo suelto
+  phase1: ['Llegó el dia!', 'Holisss!', 'Queremos ver el cmabio!', 'Fin del reto!', 'Mica te queremos ver!',
+    'holaaa 😍', 'llegué!!', '¿Cómo te quedó la piel?', 'yo tambien hice el reto 🙋‍♀️', 'muéstranos!!', 'te amo Mica', 'la reina 👑',
+    'hola desde Córdoba!', 'ya me compre la crema', 'quiero ver el antes y después', '🔥🔥🔥', '😍😍', '¿y el código?', 'día 7!!!'],
+  phase2: ['¿Qué te pasó?', '¿Qué tenes en la cara?', 'Es joda, ¿no?', '¿¿¿???', 'WTF???', '¿Te quemo?', 'Denuncien a la marca', 'Dios mio, qué horror',
+    'noooo 😱', 'es un filtro?', 'Mica estas bien??', 'andá al médico por favor', 'yo la estoy usnado 😰', 'qué es eso', '😨😨', 'no puede ser', 'devuelvan la plata'],
+  phase3: ['Al fin alguien que se muetsra tal cual es', 'Te bancamos, Mica', 'Mica, sos lo mas', 'Aguante mostrarse real', 'Yendo a prender fuego a la marca',
+    'La más auténtica', 'Que ovarios para mostrarte así', 'Al fin alguien real', 'Aguante Mica', 'Basta de filtros', 'Cancelemos ya a la marca',
+    '❤️❤️❤️', 'te quermos!!', 'gracias por mostrarlo', '👏👏👏', 'sos enorme', 'real > filtro'],
   users: ['sofi.glow', 'cami.makeup', 'luu.martinez', 'agus.skin', 'flor_bsas', 'meli.rios', 'juli.ferraro', 'dani_beauty', 'rochi.ok', 'pili.mendez',
     'valen.sz', 'brenda.lux', 'maca_ok', 'nati.gomez', 'tini.fan22', 'abril.rm', 'lara.vidal', 'mora_paz', 'emi.acosta', 'clara.nuñez',
     'ro.benitez', 'ailu.cs', 'jaz.quiroga', 'ceci_luna', 'tomi.rey', 'marti.k', 'bel.ortiz', 'yami.ok', 'guada.p', 'sol.mansilla',

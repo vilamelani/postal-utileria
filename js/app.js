@@ -118,6 +118,7 @@
     { id: '36', ep: 3, title: 'Mensaje de la marca', who: 'Celular de María Laura', desc: () => `Plano detalle. Pantalla bloqueada → mensaje de ${S.s36.sender}: “${S.s36.text}”.` },
     { id: '36B', ep: 3, title: 'Mensaje de la marca (2 mensajes)', who: 'Celular de María Laura', desc: () => `Variante de la 36, con encuadre más bajo. Llegan dos mensajes de ${S.s36B.sender}: “${S.s36B.text1}” y “${S.s36B.text2}”.` },
     { id: '38', ep: 3, title: 'Prepara el vivo', who: 'Celular de Mica', desc: () => 'Perfil → “+” → EN VIVO con la cámara frontal → iniciar transmisión. Sigue como la 40.' },
+    { id: '38C', ep: 3, title: 'Prepara el vivo (con botón de cámara)', who: 'Celular de Mica', desc: () => 'Igual que la 38B (cámara al tocar “+”), y en el vivo hay un botón para apagar y prender la cámara. Los comentarios siguen.' },
     { id: '38B', ep: 3, title: 'Prepara el vivo (cámara al tocar +)', who: 'Celular de Mica', desc: () => 'Igual que la 38, pero la cámara se enciende recién al tocar “+”: en el perfil no aparecen los avisos de cámara de iPhone.' },
     { id: '39', ep: 3, title: 'Notificación del vivo', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → “${fillU(S.s39.text)}”.` },
     { id: '41', ep: 3, title: 'La marca llama', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → llamada entrante de ${S.s41.caller} (no la atiende). Suena ${S.s41.calls} veces.` },
@@ -165,6 +166,8 @@
     flash: '<svg viewBox="0 0 24 24"><path d="M13 2.5 5.5 13.5h5.5l-1 8 7.5-11H12z"/></svg>',
     gear: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>',
     flip: '<svg viewBox="0 0 24 24"><path d="M4 9a8 8 0 0 1 14.5-3.5M20 15a8 8 0 0 1-14.5 3.5"/><path d="M18.8 2.5v3.3h-3.3M5.2 21.5v-3.3h3.3"/></svg>',
+    vcam: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="13" height="11" rx="2.5"/><path d="M15.5 10.5 21.5 7v10l-6-3.5z"/></svg>',
+    vcamOff: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="13" height="11" rx="2.5"/><path d="M15.5 10.5 21.5 7v10l-6-3.5z"/><path d="M3.5 3.5l17 17" stroke-width="2.2"/></svg>',
     mic: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v3.5"/></svg>',
     micOff: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v3.5"/><path d="M3.5 3.5l17 17" stroke-width="2.2"/></svg>',
     question: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1.9-1.1 1.8M12 16.8v.2"/></svg>',
@@ -290,7 +293,7 @@
     const prev = route;
     route = fromHash();
     resetTransient();
-    if (!['38', '38B', '40'].includes(route) && ['38', '38B', '40'].includes(prev)) stopCam();
+    if (!['38', '38B', '38C', '40'].includes(route) && ['38', '38B', '38C', '40'].includes(prev)) stopCam();
     render();
   });
 
@@ -304,12 +307,13 @@
       case '9H': case '21': case '36': case '36B': case '39': case '41': return renderLockScene(route);
       case '15': return renderReel('15');
       case '29': return renderProfile('29');
-      case '38': case '38B': return render38();
+      case '38': case '38B': case '38C': return render38();
       case '40': return renderLive('40');
       case '43': return renderViewer43();
     }
   }
-  const is38 = (r = route) => r === '38' || r === '38B';
+  const is38 = (r = route) => r === '38' || r === '38B' || r === '38C';
+  const camOnPlus = (r = route) => r === '38B' || r === '38C';
   /* 38: la cámara se enciende al entrar (permiso seguro). 38B: recién al tocar “+” (perfil sin avisos de iPhone) */
   const camOnEnter = () => route === '38' && !!S.s38.askCameraOnEnter;
   const isBusy = () => (['9H', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
@@ -906,7 +910,7 @@
   const camLive = () => !!(camStream && camStream.getTracks().some((t) => t.readyState === 'live'));
   /* Al volver a la app (desbloquear, cambiar de app) en las escenas con cámara: si el celular la cortó, se recupera sola y se vuelve a conectar al video */
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible' || !['38', '38B', '40'].includes(route)) return;
+    if (document.visibilityState !== 'visible' || !['38', '38B', '38C', '40'].includes(route)) return;
     const v = $('#camVid') || ($('#lvVid') && route !== '43' ? $('#lvVid') : null);
     if (camLive()) { if (v && v.srcObject !== camStream) { v.srcObject = camStream; } if (v) v.play().catch(() => {}); return; }
     if (route !== '40' && (R.sub['38'] || 'profile') === 'profile' && !camOnEnter()) return;
@@ -946,7 +950,7 @@
     if (sub === 'profile') {
       renderProfile('38');
       if (camOnEnter()) ensureCam();
-      else if (route === '38B') stopCam();   // 38B: perfil con la cámara apagada (sin avisos arriba)
+      else if (camOnPlus()) stopCam();   // 38B: perfil con la cámara apagada (sin avisos arriba)
       return;
     }
     if (sub === 'camera') return renderCamera();
@@ -1014,8 +1018,9 @@
   function renderLive(id) {
     applyChrome({ tone: 'light', overlay: fakeSBVisible(), dark: true });
     screen.innerHTML = `
-      <div class="lv">
+      <div class="lv" id="lvRoot">
         <video id="lvVid" class="mirror" playsinline muted autoplay></video>
+        ${route === '38C' ? `<div class="lv-camoff" id="lvCamOff"><img src="${img('micaAvatar')}" alt=""><span>Cámara apagada</span></div>` : ''}
         <div class="lv-shade"></div>
         <div class="lv-top">
           <span class="lv-badge">EN VIVO</span>
@@ -1029,12 +1034,15 @@
           <span class="lv-input">Comentar…</span>
           <span class="lv-ic">${I.question}</span>
           <span class="lv-ic">${I.personPlus}</span>
+          ${route === '38C' ? `<span class="lv-ic" id="lvCam">${I.vcam}</span>` : ''}
           <span class="lv-ic" id="lvMic">${I.mic}</span>
           <span class="lv-ic">${I.send}</span>
         </div>
       </div>`;
     attachCam($('#lvVid'));
     $('#lvMic').addEventListener('click', (e) => { e.stopPropagation(); setMute(!LV.muted); });
+    LV.camOff = false;
+    if ($('#lvCam')) $('#lvCam').addEventListener('click', (e) => { e.stopPropagation(); setCamOff(!LV.camOff); });
     startLive();
   }
 
@@ -1068,6 +1076,13 @@
     });
     screen.querySelector('.lv').addEventListener('click', () => { if (!suppressClick && v.paused) v.play().catch(() => {}); });
     startLive({ viewer: true });
+  }
+
+  /* 38C: apagar/prender la cámara en el vivo. La cámara sigue encendida por dentro (no se pierde el permiso ni tarda en volver): sólo se tapa la imagen */
+  function setCamOff(off) {
+    LV.camOff = off;
+    const b = $('#lvCam'); if (b) { b.innerHTML = off ? I.vcamOff : I.vcam; b.classList.toggle('is-muted', off); }
+    const r = $('#lvRoot'); if (r) r.classList.toggle('cam-is-off', off);
   }
 
   function setMute(m) {
@@ -1320,10 +1335,11 @@
           ${is38(r) ? `<div class="sh-btns"><button type="button" data-act="go38-profile">Perfil</button><button type="button" data-act="go38-camera">Cámara</button></div>` : ''}
           ${inLive ? `<div class="sh-big-num">${fmtNum(LV.viewers)}<small>espectadores · fase ${LV.phase === 0 ? '3' : LV.phase} de comentarios</small></div>
           <div class="sh-btns"><button type="button" data-act="phase1">Fase 1 · llegada</button><button type="button" data-act="phase2">Fase 2 · horror</button></div>
-          <div class="sh-btns"><button type="button" data-act="phase3">Fase 3 · apoyo</button><button type="button" data-act="mute">${LV.muted ? 'Activar micrófono' : 'Silenciar micrófono'}</button></div>` : ''}
+          <div class="sh-btns"><button type="button" data-act="phase3">Fase 3 · apoyo</button><button type="button" data-act="mute">${LV.muted ? 'Activar micrófono' : 'Silenciar micrófono'}</button></div>
+          ${r === '38C' ? `<button type="button" class="sh-wide" data-act="camtoggle">${LV.camOff ? 'Prender cámara' : 'Apagar cámara'}</button>` : ''}` : ''}
           <button type="button" class="sh-wide hot" data-act="reset-scene">${is38(r) ? 'Reiniciar escena (vuelve al perfil)' : 'Reiniciar el vivo'}</button>
-          <button type="button" class="sh-wide" data-act="askcam">${r === '38B' ? 'Preparar permiso de cámara (justo antes de “acción”)' : 'Pedir permiso de cámara ahora'}</button>
-          ${r === '38B' ? '<p class="sh-note">Enciende la cámara un instante para aceptar el permiso y la vuelve a apagar. Tocá “+” en menos de 1 minuto: si pasa más tiempo, iPhone puede volver a pedir el permiso.</p>' : ''}
+          <button type="button" class="sh-wide" data-act="askcam">${camOnPlus(r) ? 'Preparar permiso de cámara (justo antes de “acción”)' : 'Pedir permiso de cámara ahora'}</button>
+          ${camOnPlus(r) ? '<p class="sh-note">Enciende la cámara un instante para aceptar el permiso y la vuelve a apagar. Tocá “+” en menos de 1 minuto: si pasa más tiempo, iPhone puede volver a pedir el permiso.</p>' : ''}
           ${row('Espectadores al inicio', txt('s40.viewersStart', 'number', 'min="0"'))}
           ${row('Espectadores a los X seg', txt('s40.viewersTarget', 'number', 'min="0"'))}
           ${row('Segundos para llegar', txt('s40.rampSec', 'number', 'min="1" step="1"'))}
@@ -1331,7 +1347,7 @@
           ${row('Fase 3 a los (seg)', txt('s40.phase3At', 'number', 'min="0" step="1"'), '0 = sólo a mano')}
           ${row('Espectadores en fase 3', txt('s40.viewersPhase3', 'number', 'min="0"'))}
           ${row('Arrancar silenciada', seg('s40.startMuted', [[true, 'Sí'], [false, 'No']]))}
-          ${r === '38B' ? row('Seguidores del perfil', txt('s38.followers', 'number', 'min="0"')) : ''}
+          ${camOnPlus(r) ? row('Seguidores del perfil', txt('s38.followers', 'number', 'min="0"')) : ''}
           ${r === '38' ? row('Seguidores del perfil', txt('s38.followers', 'number', 'min="0"')) + row('Pedir cámara al entrar', seg('s38.askCameraOnEnter', [[true, 'Sí'], [false, 'No']]), 'Así el permiso no aparece en medio de la toma') : ''}
         </div>`;
     }
@@ -1340,7 +1356,7 @@
 
   function renderSheet() {
     const extras = store.get('guita.micaExtra', []).length;
-    const ep3 = ['15', '21', '29', '36', '36B', '38', '38B', '39', '40', '41', '43'].includes(route);
+    const ep3 = ['15', '21', '29', '36', '36B', '38', '38B', '38C', '39', '40', '41', '43'].includes(route);
     const contentLR = `
         ${row('Usuario', txt('account.username'))}
         ${row('Nombre', txt('account.fullName'))}
@@ -1451,8 +1467,9 @@
       case 'phase2': LV.p3t0 = 0; setPhase(2); break;
       case 'phase3': setPhase(3); break;
       case 'mute': setMute(!LV.muted); renderSheet(); break;
+      case 'camtoggle': setCamOff(!LV.camOff); renderSheet(); break;
       case 'askcam': ensureCam().then((s) => {
-        if (s && route === '38B' && (R.sub['38'] || 'profile') === 'profile') { stopCam(); toast('Permiso listo. Tocá “+” en menos de 1 minuto'); return; }
+        if (s && camOnPlus() && (R.sub['38'] || 'profile') === 'profile') { stopCam(); toast('Permiso listo. Tocá “+” en menos de 1 minuto'); return; }
         toast(s ? 'Cámara lista y activa. No cierres la app ni bloquees el celular hasta grabar' : 'Sin permiso de cámara' + (camErr && camErr.name ? ` (${camErr.name})` : ''));
       }); break;
       case 'pick': pickImage(el.dataset.key); break;

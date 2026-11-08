@@ -884,15 +884,30 @@
      ======================================================================= */
   let camStream = null, camErr = null, camPending = null;
   function ensureCam() {
-    if (camStream && camStream.active) return Promise.resolve(camStream);
+    if (camLive()) return Promise.resolve(camStream);
+    if (camStream) camStream = null;
     if (camPending) return camPending;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camErr = { name: 'NoDisponible' }; return Promise.resolve(null); }
     camPending = navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
-      .then((s) => { camStream = s; camErr = null; return s; })
+      .then((s) => {
+        camStream = s; camErr = null;
+        // si el celular corta la cámara (bloqueo de pantalla, app en segundo plano), lo marcamos para volver a pedirla sin trabarse
+        s.getTracks().forEach((t) => t.addEventListener('ended', () => { if (camStream === s) camStream = null; }));
+        return s;
+      })
       .catch((e) => { camErr = e; camStream = null; return null; })
       .finally(() => { camPending = null; });
     return camPending;
   }
+  const camLive = () => !!(camStream && camStream.getTracks().some((t) => t.readyState === 'live'));
+  /* Al volver a la app (desbloquear, cambiar de app) en las escenas con cámara: si el celular la cortó, se recupera sola y se vuelve a conectar al video */
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !['38', '40'].includes(route)) return;
+    const v = $('#camVid') || ($('#lvVid') && route !== '43' ? $('#lvVid') : null);
+    if (camLive()) { if (v && v.srcObject !== camStream) { v.srcObject = camStream; } if (v) v.play().catch(() => {}); return; }
+    if (R.sub[route] === 'profile' && !S.s38.askCameraOnEnter) return;
+    ensureCam().then((st) => { const vv = $('#camVid') || $('#lvVid'); if (st && vv && vv.isConnected) { vv.srcObject = st; vv.play().catch(() => {}); } });
+  });
   function stopCam() { if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; } }
   function attachCam(v) {
     ensureCam().then((s) => {
@@ -1412,7 +1427,7 @@
       case 'phase2': LV.p3t0 = 0; setPhase(2); break;
       case 'phase3': setPhase(3); break;
       case 'mute': setMute(!LV.muted); renderSheet(); break;
-      case 'askcam': ensureCam().then((s) => toast(s ? 'Cámara lista' : 'Sin permiso de cámara' + (camErr && camErr.name ? ` (${camErr.name})` : ''))); break;
+      case 'askcam': ensureCam().then((s) => toast(s ? 'Cámara lista y activa. No cierres la app ni bloquees el celular hasta grabar' : 'Sin permiso de cámara' + (camErr && camErr.name ? ` (${camErr.name})` : ''))); break;
       case 'pick': pickImage(el.dataset.key); break;
       case 'unpick': store.del('guita.img.' + el.dataset.key); render(); renderSheet(); toast('Foto original'); break;
       case 'pickvid': pickVideo(el.dataset.key); break;

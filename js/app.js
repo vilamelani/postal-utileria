@@ -913,10 +913,27 @@
     ensureCam().then((st) => { const vv = $('#camVid') || $('#lvVid'); if (st && vv && vv.isConnected) { vv.srcObject = st; vv.play().catch(() => {}); } });
   });
   function stopCam() { if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; } }
+  /* iPhone: al arrancar la cámara, los primeros cuadros se dibujan chicos (tamaño propio del video) antes de ocupar
+     toda la pantalla. El video queda invisible (fondo negro) hasta que su tamaño se estabiliza, y recién ahí aparece. */
+  function revealWhenStable(v) {
+    v.classList.add('cam-wait');
+    let last = '', stableSince = 0;
+    const t0 = performance.now();
+    const check = () => {
+      if (!v.isConnected) return;
+      const now = performance.now();
+      const dims = v.videoWidth + 'x' + v.videoHeight;
+      const playing = v.readyState >= 2 && v.videoWidth > 0 && !v.paused;
+      if (dims !== last) { last = dims; stableSince = now; }
+      if ((playing && now - stableSince >= 550) || now - t0 > 2500) { v.classList.remove('cam-wait'); return; }
+      setTimeout(check, 60);
+    };
+    check();
+  }
   function attachCam(v) {
     ensureCam().then((s) => {
       if (!v.isConnected) return;
-      if (s) { v.srcObject = s; v.play().catch(() => {}); }
+      if (s) { revealWhenStable(v); v.srcObject = s; v.play().catch(() => {}); }
       else {
         v.classList.add('nomirror'); v.loop = true; v.src = VIDEO_DEFAULT.reel21; v.play().catch(() => {});
         toast('Sin acceso a la cámara' + (camErr && camErr.name ? ` (${camErr.name})` : '') + '. Revisá los permisos.');

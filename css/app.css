@@ -467,6 +467,8 @@ svg { display: block; }
 .cam, .lv { position: absolute; inset: 0; background: #111; color: #fff; overflow: hidden; }
 .cam video, .lv video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 video.mirror { transform: scaleX(-1); }
+.cam video, .lv video { transition: opacity .18s ease-out; }
+video.cam-wait { opacity: 0 !important; transition: none; }
 video.mirror.nomirror { transform: none; }
 .cam-top { position: absolute; left: 0; right: 0; top: calc(var(--sb-h) + 8px); display: flex; justify-content: space-between; padding: 0 14px; z-index: 2; }
 #phone.real-sb .cam-top, #phone.real-sb .lv-top { top: 12px; }

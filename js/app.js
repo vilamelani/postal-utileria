@@ -118,6 +118,7 @@
     { id: '36', ep: 3, title: 'Mensaje de la marca', who: 'Celular de María Laura', desc: () => `Plano detalle. Pantalla bloqueada → mensaje de ${S.s36.sender}: “${S.s36.text}”.` },
     { id: '36B', ep: 3, title: 'Mensaje de la marca (2 mensajes)', who: 'Celular de María Laura', desc: () => `Variante de la 36, con encuadre más bajo. Llegan dos mensajes de ${S.s36B.sender}: “${S.s36B.text1}” y “${S.s36B.text2}”.` },
     { id: '38', ep: 3, title: 'Prepara el vivo', who: 'Celular de Mica', desc: () => 'Perfil → “+” → EN VIVO con la cámara frontal → iniciar transmisión. Sigue como la 40.' },
+    { id: '38B', ep: 3, title: 'Prepara el vivo (cámara al tocar +)', who: 'Celular de Mica', desc: () => 'Igual que la 38, pero la cámara se enciende recién al tocar “+”: en el perfil no aparecen los avisos de cámara de iPhone.' },
     { id: '39', ep: 3, title: 'Notificación del vivo', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → “${fillU(S.s39.text)}”.` },
     { id: '41', ep: 3, title: 'La marca llama', who: 'Celular de María Laura', desc: () => `Pantalla bloqueada → llamada entrante de ${S.s41.caller} (no la atiende). Suena ${S.s41.calls} veces.` },
     { id: '43', ep: 3, title: 'María Laura mira el vivo', who: 'Celular de María Laura', desc: () => `Ve el vivo de @${S.mica.username} como espectadora (video cargado desde el menú oculto). Arranca en ${fmtNum(S.s43.viewersStart)} y sube; comentarios de apoyo.` },
@@ -289,7 +290,7 @@
     const prev = route;
     route = fromHash();
     resetTransient();
-    if (!['38', '40'].includes(route) && ['38', '40'].includes(prev)) stopCam();
+    if (!['38', '38B', '40'].includes(route) && ['38', '38B', '40'].includes(prev)) stopCam();
     render();
   });
 
@@ -303,12 +304,15 @@
       case '9H': case '21': case '36': case '36B': case '39': case '41': return renderLockScene(route);
       case '15': return renderReel('15');
       case '29': return renderProfile('29');
-      case '38': return render38();
+      case '38': case '38B': return render38();
       case '40': return renderLive('40');
       case '43': return renderViewer43();
     }
   }
-  const isBusy = () => (['9H', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || (route === '38' && R.sub['38'] === 'live') || route === '40' || route === '43';
+  const is38 = (r = route) => r === '38' || r === '38B';
+  /* 38: la cámara se enciende al entrar (permiso seguro). 38B: recién al tocar “+” (perfil sin avisos de iPhone) */
+  const camOnEnter = () => route === '38' && !!S.s38.askCameraOnEnter;
+  const isBusy = () => (['9H', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -902,10 +906,10 @@
   const camLive = () => !!(camStream && camStream.getTracks().some((t) => t.readyState === 'live'));
   /* Al volver a la app (desbloquear, cambiar de app) en las escenas con cámara: si el celular la cortó, se recupera sola y se vuelve a conectar al video */
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible' || !['38', '40'].includes(route)) return;
+    if (document.visibilityState !== 'visible' || !['38', '38B', '40'].includes(route)) return;
     const v = $('#camVid') || ($('#lvVid') && route !== '43' ? $('#lvVid') : null);
     if (camLive()) { if (v && v.srcObject !== camStream) { v.srcObject = camStream; } if (v) v.play().catch(() => {}); return; }
-    if (R.sub[route] === 'profile' && !S.s38.askCameraOnEnter) return;
+    if (route !== '40' && (R.sub['38'] || 'profile') === 'profile' && !camOnEnter()) return;
     ensureCam().then((st) => { const vv = $('#camVid') || $('#lvVid'); if (st && vv && vv.isConnected) { vv.srcObject = st; vv.play().catch(() => {}); } });
   });
   function stopCam() { if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; } }
@@ -924,7 +928,8 @@
     const sub = R.sub['38'] || 'profile';
     if (sub === 'profile') {
       renderProfile('38');
-      if (S.s38.askCameraOnEnter) ensureCam();
+      if (camOnEnter()) ensureCam();
+      else if (route === '38B') stopCam();   // 38B: perfil con la cámara apagada (sin avisos arriba)
       return;
     }
     if (sub === 'camera') return renderCamera();
@@ -1290,17 +1295,18 @@
           ${row('Comentarios al inicio', seg('s43.phase', [[3, 'Apoyo'], [2, 'Horror'], [1, 'Llegada']]))}
         </div>`;
     }
-    if (r === '38' || r === '40') {
+    if (is38(r) || r === '40') {
       const inLive = r === '40' || R.sub['38'] === 'live';
       return `
-        <div class="sh-sec">Escena ${r}${r === '38' ? ` · ${{ profile: 'perfil', camera: 'cámara', live: 'en vivo' }[R.sub['38'] || 'profile']}` : ''}</div>
+        <div class="sh-sec">Escena ${r}${is38(r) ? ` · ${{ profile: 'perfil', camera: 'cámara', live: 'en vivo' }[R.sub['38'] || 'profile']}` : ''}</div>
         <div class="sh-card">
-          ${r === '38' ? `<div class="sh-btns"><button type="button" data-act="go38-profile">Perfil</button><button type="button" data-act="go38-camera">Cámara</button></div>` : ''}
+          ${is38(r) ? `<div class="sh-btns"><button type="button" data-act="go38-profile">Perfil</button><button type="button" data-act="go38-camera">Cámara</button></div>` : ''}
           ${inLive ? `<div class="sh-big-num">${fmtNum(LV.viewers)}<small>espectadores · fase ${LV.phase === 0 ? '3' : LV.phase} de comentarios</small></div>
           <div class="sh-btns"><button type="button" data-act="phase1">Fase 1 · llegada</button><button type="button" data-act="phase2">Fase 2 · horror</button></div>
           <div class="sh-btns"><button type="button" data-act="phase3">Fase 3 · apoyo</button><button type="button" data-act="mute">${LV.muted ? 'Activar micrófono' : 'Silenciar micrófono'}</button></div>` : ''}
-          <button type="button" class="sh-wide hot" data-act="reset-scene">${r === '38' ? 'Reiniciar escena (vuelve al perfil)' : 'Reiniciar el vivo'}</button>
-          <button type="button" class="sh-wide" data-act="askcam">Pedir permiso de cámara ahora</button>
+          <button type="button" class="sh-wide hot" data-act="reset-scene">${is38(r) ? 'Reiniciar escena (vuelve al perfil)' : 'Reiniciar el vivo'}</button>
+          <button type="button" class="sh-wide" data-act="askcam">${r === '38B' ? 'Preparar permiso de cámara (justo antes de “acción”)' : 'Pedir permiso de cámara ahora'}</button>
+          ${r === '38B' ? '<p class="sh-note">Enciende la cámara un instante para aceptar el permiso y la vuelve a apagar. Tocá “+” en menos de 1 minuto: si pasa más tiempo, iPhone puede volver a pedir el permiso.</p>' : ''}
           ${row('Espectadores al inicio', txt('s40.viewersStart', 'number', 'min="0"'))}
           ${row('Espectadores a los X seg', txt('s40.viewersTarget', 'number', 'min="0"'))}
           ${row('Segundos para llegar', txt('s40.rampSec', 'number', 'min="1" step="1"'))}
@@ -1308,6 +1314,7 @@
           ${row('Fase 3 a los (seg)', txt('s40.phase3At', 'number', 'min="0" step="1"'), '0 = sólo a mano')}
           ${row('Espectadores en fase 3', txt('s40.viewersPhase3', 'number', 'min="0"'))}
           ${row('Arrancar silenciada', seg('s40.startMuted', [[true, 'Sí'], [false, 'No']]))}
+          ${r === '38B' ? row('Seguidores del perfil', txt('s38.followers', 'number', 'min="0"')) : ''}
           ${r === '38' ? row('Seguidores del perfil', txt('s38.followers', 'number', 'min="0"')) + row('Pedir cámara al entrar', seg('s38.askCameraOnEnter', [[true, 'Sí'], [false, 'No']]), 'Así el permiso no aparece en medio de la toma') : ''}
         </div>`;
     }
@@ -1316,7 +1323,7 @@
 
   function renderSheet() {
     const extras = store.get('guita.micaExtra', []).length;
-    const ep3 = ['15', '21', '29', '36', '36B', '38', '39', '40', '41', '43'].includes(route);
+    const ep3 = ['15', '21', '29', '36', '36B', '38', '38B', '39', '40', '41', '43'].includes(route);
     const contentLR = `
         ${row('Usuario', txt('account.username'))}
         ${row('Nombre', txt('account.fullName'))}
@@ -1414,7 +1421,7 @@
       case 'reset-scene':
         R.step[route] = 0;
         if (route === '7E') R.sub['7E'] = S.s7E.start;
-        if (route === '38') { stopLive(); R.sub['38'] = 'profile'; camMode = 1; }
+        if (is38()) { stopLive(); R.sub['38'] = 'profile'; camMode = 1; }
         if (route === '21') R.sub['21'] = 'arm';
         saveRuntime(); render(); closeSheet(); toast('Escena reiniciada');
         break;
@@ -1427,7 +1434,10 @@
       case 'phase2': LV.p3t0 = 0; setPhase(2); break;
       case 'phase3': setPhase(3); break;
       case 'mute': setMute(!LV.muted); renderSheet(); break;
-      case 'askcam': ensureCam().then((s) => toast(s ? 'Cámara lista y activa. No cierres la app ni bloquees el celular hasta grabar' : 'Sin permiso de cámara' + (camErr && camErr.name ? ` (${camErr.name})` : ''))); break;
+      case 'askcam': ensureCam().then((s) => {
+        if (s && route === '38B' && (R.sub['38'] || 'profile') === 'profile') { stopCam(); toast('Permiso listo. Tocá “+” en menos de 1 minuto'); return; }
+        toast(s ? 'Cámara lista y activa. No cierres la app ni bloquees el celular hasta grabar' : 'Sin permiso de cámara' + (camErr && camErr.name ? ` (${camErr.name})` : ''));
+      }); break;
       case 'pick': pickImage(el.dataset.key); break;
       case 'unpick': store.del('guita.img.' + el.dataset.key); render(); renderSheet(); toast('Foto original'); break;
       case 'pickvid': pickVideo(el.dataset.key); break;

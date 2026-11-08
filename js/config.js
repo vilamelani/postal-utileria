@@ -94,6 +94,10 @@ window.GUITA_DEFAULTS = {
   // Esc 36 · Plano detalle del celular de María Laura: llega un mensaje de la marca (app de chat genérica, sin logo de WhatsApp)
   s36: { start: 'lock', trigger: 'both', delay: 5, sender: '7Days', appLabel: 'Chat', text: 'Hola María Laura, en diez minutos tenemos el vivo' },
 
+  // Esc 36B · Variante de la 36: llegan DOS mensajes seguidos, y la fecha/hora/notificaciones van un poco más abajo para encuadrar
+  s36B: { start: 'lock', trigger: 'both', delay: 5, sender: '7Days', appLabel: 'Chat',
+          text1: 'Hola María Laura', text2: 'En diez minutos tenemos el vivo', gapSec: 2, offset: 40 },
+
   // Esc 38 · Perfil propio de Mica → "+" → EN VIVO → iniciar transmisión
   s38: { followers: 41800, askCameraOnEnter: true },                       // seguidores: [INVENTADO]
 

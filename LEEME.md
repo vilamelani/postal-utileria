@@ -24,6 +24,7 @@ Es una web app: se abre en el navegador del celular, se instala en la pantalla d
 |---|---|---|
 | **29** | María Laura | Perfil de @micarr visto desde su cuenta. Deslizar hacia abajo: 15 mil → 20 mil → 30 mil |
 | **36** | María Laura | Plano detalle. Pantalla bloqueada → llega un mensaje de **7Days**: “Hola María Laura, en diez minutos tenemos el vivo” (ícono de una app de chat genérica, no WhatsApp). **ARMAR**; llega por temporizador (5 s) o toque |
+| **36B** | María Laura | Variante de la 36 con **dos mensajes** de 7Days (“Hola María Laura” y 2 s después “En diez minutos tenemos el vivo”) y la fecha, la hora y las notificaciones un poco más abajo para encuadrar. El corrimiento se ajusta en el menú oculto |
 | **38** | Mica | Su perfil → "+" → cámara frontal espejada → modo **EN VIVO** (tocar o deslizar) → botón central → "Iniciando video en vivo…" → sigue como la 40 |
 | **39** | María Laura | Pantalla bloqueada → "micarr está transmitiendo en VIVO" (temporizador o toque) |
 | **41** | María Laura | Pantalla bloqueada → **llamada entrante de 7Days** (no la atiende). Suena 9 s, queda “Llamada perdida”, a los 5 s vuelve a sonar, y al final quedan “2 llamadas perdidas”. **ARMAR**; arranca por temporizador (5 s) o toque. Vibra en Android |

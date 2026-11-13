@@ -859,11 +859,14 @@
     });
     // teclado del iPhone: iOS achica y corre la parte visible de la pantalla. El chat se pega a esa parte visible
     // (arriba el encabezado, abajo la barra de escribir justo sobre el teclado) en vez de dejar que se corra hacia arriba.
+    // Ojo: en iPhone window.innerHeight también se achica con el teclado, así que se compara contra el alto
+    // de la pantalla tomado antes de abrirlo (y contra el alto del documento, que no cambia).
     const vv = window.visualViewport;
+    const fullH = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, screen.clientHeight || 0);
     const fit = () => {
       if (!root.isConnected) { if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); } return; }
-      const kb = vv ? Math.max(0, window.innerHeight - vv.height) : 0;
-      const open = kb > 80;
+      const base = Math.max(fullH, document.documentElement.clientHeight || 0);
+      const open = !!vv && (vv.height < base - 80 || vv.offsetTop > 0) && document.activeElement === inp;
       root.classList.toggle('kb-open', open);
       if (open) {
         root.style.position = 'fixed';

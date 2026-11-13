@@ -810,6 +810,7 @@
       : { title: esc(c['from' + i]), body: esc(c['text' + i]), dm: true }));
   }
 
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   /* ---------- Esc 9F: Daniel le escribe a María (app de mensajería genérica) ---------- */
   function renderChat9F() {
     const c = S.s9F;
@@ -869,9 +870,11 @@
     const fit = () => {
       if (!root.isConnected) { if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); } return; }
       const base = Math.max(fullH, document.documentElement.clientHeight || 0);
-      const open = !!vv && (vv.height < base - 80 || vv.offsetTop > 0) && document.activeElement === inp;
+      const open = document.activeElement === inp && ((!!vv && (vv.height < base - 80 || vv.offsetTop > 0)) || window.innerHeight < base - 80);
       root.classList.toggle('kb-open', open);
-      if (open) {
+      // Android ya achica la página sola con el teclado (interactive-widget=resizes-content en el viewport):
+      // el ajuste fijo es sólo para iPhone, que en vez de achicarla la corre hacia arriba.
+      if (open && IS_IOS) {
         root.style.position = 'fixed';
         root.style.top = vv.offsetTop + 'px';
         root.style.left = vv.offsetLeft + 'px';

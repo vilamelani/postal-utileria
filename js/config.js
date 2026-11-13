@@ -62,6 +62,25 @@ window.GUITA_DEFAULTS = {
     vibrate: 'continuous'  // 'continuous' | 'each' | 'off'
   },
 
+  // Esc 9B y 9E · Planos detalle del celular en el sótano: llegan 2 notificaciones cada una.
+  // app: 'postal' (mensaje directo en la app) o 'chat' (app de mensajería genérica). from = quién escribe.
+  s9B: { start: 'lock', trigger: 'both', delay: 5, gapSec: 2, chatLabel: 'Chat',
+         app1: 'postal', from1: 'flor.mateina', text1: 'Holaa, ¿tenés stock?',
+         app2: 'chat',   from2: 'Juli Rocha',   text2: 'Necesito seis paquetes para mañana.' },          // remitentes: [INVENTADO]
+  s9E: { start: 'lock', trigger: 'both', delay: 5, gapSec: 0.9, chatLabel: 'Chat',                      // 0,9 s: "las notificaciones se superponen"
+         app1: 'chat',   from1: 'Caro Palermo', text1: 'Holii, ¿hacen envíos a San Isidro?',
+         app2: 'postal', from2: 'nachito.92',   text2: 'Buenas, ¿qué tal? Quería saber si hacen venta al por mayor. gracias' },
+
+  // Esc 9F · Daniel le escribe a María desde la app de mensajería
+  s9F: {
+    contact: 'María',
+    status: 'últ. vez hoy a las 09:12',                         // [INVENTADO]
+    text: 'Atendeme María. Conseguí un trabajo mejor. ¿Podemos intentarlo?',
+    typeMode: 'magic',                                         // 'magic' (cualquier tecla escribe el texto) | 'free'
+    prev1: '¿Podemos hablar?', prev1Time: '22:47',             // mensaje anterior de Daniel, ayer, sin respuesta [INVENTADO] (vacío = no se muestra)
+    prev2: 'María', prev2Time: '22:51'                         // [INVENTADO]
+  },
+
   /* ===================== EPISODIO 2 y 3 ===================== */
 
   // Cuenta de Mica (influencer)

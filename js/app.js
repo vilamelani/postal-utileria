@@ -111,6 +111,9 @@
   const SCENES = [
     { id: '7E', ep: 1, title: 'Crean la cuenta', who: 'Celular de La Revivida', desc: () => `Bienvenida → formulario → perfil vacío. Refresh: ${S.s7E.steps.map(fmtNum).join(' → ')}.` },
     { id: '7G', ep: 1, title: 'Actualizan seguidores', who: 'Celular de La Revivida', desc: () => `Perfil con 1 publicación. Refresh: ${S.s7G.steps.map(fmtNum).join(' → ')}.` },
+    { id: '9B', ep: 1, title: 'Primeros pedidos', who: 'Celular de La Revivida', desc: () => `Plano detalle. Pantalla bloqueada → vibra y llegan 2 notificaciones (${appName9(S.s9B.app1)} y ${appName9(S.s9B.app2)}).` },
+    { id: '9E', ep: 1, title: 'Notificaciones superpuestas', who: 'Celular de La Revivida', desc: () => `Plano detalle. Llegan 2 notificaciones casi juntas (${appName9(S.s9E.app1)} y ${appName9(S.s9E.app2)}).` },
+    { id: '9F', ep: 1, title: 'Daniel le escribe a María', who: 'Celular de Daniel', desc: () => `Chat con ${S.s9F.contact}. ${S.s9F.typeMode === 'magic' ? 'Cualquier tecla escribe' : 'Escribe'} “${S.s9F.text}” y lo envía.` },
     { id: '9H', ep: 1, title: 'Lluvia de notificaciones', who: 'Celular de La Revivida', desc: () => `Pantalla negra → se enciende y entran notificaciones sin parar${canVibrate ? ', con vibración' : ''}.` },
     { id: '15', ep: 2, title: 'Video de skincare', who: 'Celular de Ariel', desc: () => 'Reel de una influencer en pantalla completa. Ariel bloquea el celular con el botón.' },
     { id: '21', ep: 2, title: 'Micar publicó un video', who: 'Celular de Ariel', desc: () => 'Pantalla bloqueada → llega la notificación → al tocarla se abre el reel.' },
@@ -286,7 +289,7 @@
   }
   function resetTransient() {
     stopFeed(); stopLive();
-    ['9H', '21', '36', '36B', '39', '41'].forEach((id) => { R.sub[id] = 'arm'; });
+    ['9B', '9E', '9H', '21', '36', '36B', '39', '41'].forEach((id) => { R.sub[id] = 'arm'; });
     R.sub['38'] = 'profile'; R.sub['40'] = 'live';
   }
   window.addEventListener('hashchange', () => {
@@ -304,7 +307,8 @@
       case 'menu': return renderMenu();
       case '7E': return render7E();
       case '7G': return renderProfile('7G');
-      case '9H': case '21': case '36': case '36B': case '39': case '41': return renderLockScene(route);
+      case '9B': case '9E': case '9H': case '21': case '36': case '36B': case '39': case '41': return renderLockScene(route);
+      case '9F': return renderChat9F();
       case '15': return renderReel('15');
       case '29': return renderProfile('29');
       case '38': case '38B': case '38C': return render38();
@@ -316,7 +320,7 @@
   const camOnPlus = (r = route) => r === '38B' || r === '38C';
   /* 38: la cámara se enciende al entrar (permiso seguro). 38B: recién al tocar “+” (perfil sin avisos de iPhone) */
   const camOnEnter = () => route === '38' && !!S.s38.askCameraOnEnter;
-  const isBusy = () => (['9H', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
+  const isBusy = () => (['9B', '9E', '9H', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || route === '9F' || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -605,6 +609,8 @@
       armTitle: 'Mensaje de la marca', notif: () => ({ title: esc(S.s36.sender), body: esc(S.s36.text), dm: true, chat: true, label: esc(S.s36.appLabel) }) },
     '41': { cfg: () => S.s41, start: () => S.s41.start, stream: false,
       armTitle: 'La marca llama a María Laura' },
+    '9B': { cfg: () => S.s9B, start: () => S.s9B.start, stream: false, armTitle: 'Primeros pedidos (2 notificaciones)', notifs: () => notifs9('s9B') },
+    '9E': { cfg: () => S.s9E, start: () => S.s9E.start, stream: false, armTitle: 'Notificaciones superpuestas', notifs: () => notifs9('s9E') },
     '36B': { cfg: () => S.s36B, start: () => S.s36B.start, stream: false,
       armTitle: 'Mensaje de la marca · 2 mensajes',
       notifs: () => [
@@ -629,6 +635,7 @@
       const extra = id === '9H'
         ? `Notificaciones cada ${c.interval} s${c.accelerate ? ', cada vez más rápido' : ''}.`
         : id === '21' ? 'Al tocar la notificación se abre el reel.'
+        : (id === '9B' || id === '9E') ? `Llegan 2 notificaciones con ${c.gapSec} s de diferencia.`
         : id === '36B' ? `Llegan 2 mensajes con ${c.gapSec} s de diferencia. Fecha y hora más abajo (${c.offset} px).`
         : id === '41' ? `Después suena ${c.calls} veces (${c.ringSec} s cada una) y queda “llamada perdida”.` : '';
       screen.innerHTML = `
@@ -789,6 +796,79 @@
     if (S.s9H.vibrate === 'each' && canVibrate) { try { navigator.vibrate(350); } catch (e) { /* nada */ } }
     if (S.s9H.accelerate) nInterval = Math.max(+S.s9H.minInterval || 0.35, nInterval * 0.88);
     notifTimer = setTimeout(tickNotif, nInterval * 1000);
+  }
+
+  /* 9B / 9E: cada mensaje puede venir de la app (mensaje directo) o de la app de mensajería genérica */
+  const appName9 = (a) => (a === 'chat' ? 'mensajería' : S.appName);
+  function notifs9(k) {
+    const c = S[k];
+    return [1, 2].map((i) => (c['app' + i] === 'chat'
+      ? { title: esc(c['from' + i]), body: esc(c['text' + i]), dm: true, chat: true, label: esc(c.chatLabel || 'Chat') }
+      : { title: esc(c['from' + i]), body: esc(c['text' + i]), dm: true }));
+  }
+
+  /* ---------- Esc 9F: Daniel le escribe a María (app de mensajería genérica) ---------- */
+  function renderChat9F() {
+    const c = S.s9F;
+    applyChrome({ tone: 'light' });
+    const ini = esc((c.contact || '?').trim().charAt(0).toUpperCase());
+    const ios = S.platform === 'ios';
+    const prev = [[c.prev1, c.prev1Time], [c.prev2, c.prev2Time]].filter(([t]) => t && String(t).trim());
+    const check2 = '<svg class="ck" viewBox="0 0 18 12"><path d="M1 6.5l3.2 3.2L10 3.5M7 9.7l1 0 7-6.2"/></svg>';
+    screen.innerHTML = `
+      <div class="ch ${ios ? 'ch-ios' : 'ch-and'}" id="chRoot">
+        <div class="ch-top">
+          <span class="ch-back">${ios ? I.backIOS : I.backAnd}</span>
+          <span class="ch-av">${ini}</span>
+          <span class="ch-who"><b>${esc(c.contact)}</b><small>${esc(c.status || '')}</small></span>
+          <span class="ch-tic">${I.vcam}</span>
+          <span class="ch-tic">${I.handset}</span>
+        </div>
+        <div class="ch-body" id="chBody">
+          ${prev.length ? `<div class="ch-day">Ayer</div>${prev.map(([t, h]) => `<div class="ch-msg out"><span>${esc(t)}</span><em>${esc(h || '')} ${check2}</em></div>`).join('')}` : ''}
+          <div class="ch-day">Hoy</div>
+        </div>
+        <div class="ch-bar">
+          <span class="ch-plus">${I.plus}</span>
+          <div class="ch-field"><textarea id="chInput" rows="1" placeholder="Mensaje" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></div>
+          <button type="button" class="ch-send" id="chSend" aria-label="Enviar">${I.cam}</button>
+        </div>
+      </div>`;
+    const inp = $('#chInput'), btn = $('#chSend'), body = $('#chBody'), root = $('#chRoot');
+    const preset = String(c.text || '');
+    const sync = () => {
+      if (c.typeMode === 'magic') {
+        const n = Math.min(inp.value.length, preset.length);
+        if (inp.value !== preset.slice(0, n)) inp.value = preset.slice(0, n);
+      }
+      inp.style.height = 'auto'; inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+      const has = inp.value.trim().length > 0;
+      btn.classList.toggle('on', has); btn.innerHTML = has ? I.send : I.cam;
+    };
+    inp.addEventListener('input', sync);
+    root.querySelector('.ch-field').addEventListener('click', () => inp.focus());
+    btn.addEventListener('mousedown', (e) => e.preventDefault());     // que no se cierre el teclado al tocar enviar
+    btn.addEventListener('click', () => {
+      const t = inp.value.trim(); if (!t) return;
+      const hh = timeStr();
+      const m = document.createElement('div'); m.className = 'ch-msg out new';
+      m.innerHTML = `<span>${esc(t)}</span><em>${hh} <svg class="ck one" viewBox="0 0 18 12"><path d="M3 6.5l3.2 3.2L13 3"/></svg></em>`;
+      body.appendChild(m); body.scrollTop = body.scrollHeight;
+      inp.value = ''; sync();
+      later(() => { const e = m.querySelector('em'); if (e) e.innerHTML = `${hh} ${check2}`; }, 1100);
+    });
+    // teclado del celular: la barra de escribir queda pegada arriba del teclado
+    const vv = window.visualViewport;
+    const fit = () => {
+      if (!root.isConnected) { if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); } return; }
+      const kb = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+      root.style.setProperty('--kb', kb + 'px');
+      root.classList.toggle('kb-open', kb > 0);
+      if (kb > 0) window.scrollTo(0, 0);
+      body.scrollTop = body.scrollHeight;
+    };
+    if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); }
+    body.scrollTop = body.scrollHeight;
   }
 
   function notifFrom(n) {
@@ -1286,7 +1366,22 @@
           ${r !== '29' ? row('Publicaciones', txt(`${k}.posts`, 'number', 'min="0" max="9"')) + row('Seguidos', txt(`${k}.following`, 'number', 'min="0"')) + row('Mostrar biografía', seg(`${k}.showBio`, [[true, 'Sí'], [false, 'No']])) : ''}
         </div>`;
     }
-    if (r === '9H' || r === '21' || r === '36' || r === '36B' || r === '39' || r === '41') {
+    if (r === '9F') {
+      return `
+        <div class="sh-sec">Escena 9F · chat de Daniel</div>
+        <div class="sh-card">
+          <button type="button" class="sh-wide hot" data-act="reset-scene">Reiniciar escena (borra el mensaje enviado)</button>
+          ${row('Escritura', seg('s9F.typeMode', [['magic', 'Mágica'], ['free', 'Libre']]), 'Mágica: cualquier tecla escribe el texto correcto')}
+          ${row('Mensaje', txt('s9F.text'))}
+          ${row('Contacto', txt('s9F.contact'))}
+          ${row('Debajo del nombre', txt('s9F.status'), 'Vacío = nada')}
+          ${row('Mensaje anterior 1 (ayer)', txt('s9F.prev1'), 'Vacío = no se muestra')}
+          ${row('Hora', txt('s9F.prev1Time'))}
+          ${row('Mensaje anterior 2 (ayer)', txt('s9F.prev2'), 'Vacío = no se muestra')}
+          ${row('Hora', txt('s9F.prev2Time'))}
+        </div>`;
+    }
+    if (r === '9B' || r === '9E' || r === '9H' || r === '21' || r === '36' || r === '36B' || r === '39' || r === '41') {
       const k = 's' + r;
       return `
         <div class="sh-sec">Escena ${r}</div>
@@ -1299,7 +1394,8 @@
           ${r === '36' ? row('Nombre del remitente', txt('s36.sender')) + row('Nombre de la app de chat', txt('s36.appLabel'), 'Se ve en Android') : ''}
           ${r === '41' ? row('Quién llama', txt('s41.caller')) + row('Debajo del nombre', txt('s41.subtitle'), 'En iPhone: “móvil”') + row('Veces que suena', txt('s41.calls', 'number', 'min="1" max="5"')) + row('Segundos sonando', txt('s41.ringSec', 'number', 'min="2"')) + row('Pausa entre llamadas (seg)', txt('s41.gapSec', 'number', 'min="1"')) + row('Vibración', seg('s41.vibrate', [[true, 'Sí'], [false, 'No']]), canVibrate ? '' : 'Este celular no permite vibrar desde la app') : ''}
           ${r === '36B' ? row('Nombre del remitente', txt('s36B.sender')) + row('Nombre de la app de chat', txt('s36B.appLabel'), 'Se ve en Android') + row('Primer mensaje', txt('s36B.text1')) + row('Segundo mensaje', txt('s36B.text2')) + row('Segundos entre mensajes', txt('s36B.gapSec', 'number', 'min="0.3" step="0.5"')) + row('Bajar fecha, hora y mensajes', txt('s36B.offset', 'number', 'min="0" max="200" step="5"'), 'En píxeles (0 = posición normal)') : ''}
-          ${r !== '9H' && r !== '41' && r !== '36B' ? row('Texto', txt(`${k}.text`), r === '36' ? '' : '{u} = usuario de Mica') : ''}
+          ${r === '9B' || r === '9E' ? [1, 2].map((i) => `<div class="sh-sub">Notificación ${i}</div>` + row('Viene de', seg(`${k}.app${i}`, [['postal', esc(S.appName)], ['chat', 'Mensajería']])) + row('Quién escribe', txt(`${k}.from${i}`)) + row('Texto', txt(`${k}.text${i}`))).join('') + row('Segundos entre una y otra', txt(`${k}.gapSec`, 'number', 'min="0.2" step="0.1"')) + row('Nombre de la app de mensajería', txt(`${k}.chatLabel`), 'Se ve en Android') : ''}
+          ${r !== '9H' && r !== '41' && r !== '36B' && r !== '9B' && r !== '9E' ? row('Texto', txt(`${k}.text`), r === '36' ? '' : '{u} = usuario de Mica') : ''}
           ${r === '21' ? vidRow('Video del reel', 'reel21') : ''}
         </div>`;
     }

@@ -9,6 +9,9 @@ Es una web app: se abre en el navegador del celular, se instala en la pantalla d
 |---|---|---|
 | **7E** | Bienvenida → formulario "Creá tu cuenta" → perfil vacío con 0 seguidores | El actor toca "Crear cuenta nueva", escribe en los campos (cualquier tecla escribe el texto correcto), toca "Crear cuenta". En el perfil desliza hacia abajo: 0 → 85 |
 | **7G** | Perfil con 1 publicación y biografía | Desliza hacia abajo: 85 → 435 → 3.317 |
+| **9B** | Plano detalle. Pantalla bloqueada → vibra y llegan 2 notificaciones: “Holaa, ¿tenés stock?” y “Necesito seis paquetes para mañana.” | **ARMAR**; arranca por temporizador (5 s) o toque. Desde el menú oculto se elige si cada una viene de la app o de la mensajería (y quién escribe) |
+| **9E** | Igual que la 9B, pero las 2 notificaciones llegan casi juntas (0,9 s): “Holii, ¿hacen envíos a San Isidro?” y “Buenas, ¿qué tal? Quería saber si hacen venta al por mayor. gracias” | Igual que la 9B |
+| **9F** | Celular de Daniel: chat con María en la app de mensajería | Toca la barra de escribir, se abre el teclado del celular y **cualquier tecla escribe** “Atendeme María. Conseguí un trabajo mejor. ¿Podemos intentarlo?”. Toca enviar. Para repetir: menú oculto → “Reiniciar escena” |
 | **9H** | Pantalla negra que se enciende y recibe notificaciones sin parar, con vibración (solo Android) | Alguien del equipo toca **ARMAR**. La pantalla queda negra. Arranca sola a los 8 s, o antes si se toca la pantalla |
 
 ### Episodio 2 (celular de Ariel)

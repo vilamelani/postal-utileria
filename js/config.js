@@ -71,6 +71,20 @@ window.GUITA_DEFAULTS = {
          app1: 'chat',   from1: 'Caro Palermo', text1: 'Holii, ¿hacen envíos a San Isidro?',
          app2: 'postal', from2: 'nachito.92',   text2: 'Buenas, ¿qué tal? Quería saber si hacen venta al por mayor. gracias' },
 
+  // Esc 9E2 · Variante de la 9E con muchas más notificaciones, bien seguidas, para que se amontonen.
+  // Las del guion llegan al final, así quedan arriba de todo y se leen. count = cuántas se usan (máx. 10).
+  s9E2: { start: 'lock', trigger: 'both', delay: 5, gapSec: 0.6, chatLabel: 'Chat', count: 8,
+          app1: 'chat',   from1: 'Lu Campos',    text1: '¿Cuánto sale el medio kilo?',                     // 1 a 6: [INVENTADO]
+          app2: 'postal', from2: 'sofi.verde',   text2: '¿Siguen tomando pedidos?',
+          app3: 'chat',   from3: 'Fran Quiroga', text3: '¿Aceptan transferencia? Pasame el alias porfa',
+          app4: 'postal', from4: 'santi.bsas',   text4: '¿Hacen envíos a zona oeste?',
+          app5: 'chat',   from5: 'Meli Gómez',   text5: 'Holaaa quiero 3!!',
+          app6: 'postal', from6: 'vale.mate',    text6: '¿Cuándo reponen?',
+          app7: 'chat',   from7: 'Caro Palermo', text7: 'Holii, ¿hacen envíos a San Isidro?',
+          app8: 'postal', from8: 'nachito.92',   text8: 'Buenas, ¿qué tal? Quería saber si hacen venta al por mayor. gracias',
+          app9: 'chat',   from9: 'Dami',         text9: 'La probé en lo de mi tía, ¿cómo pido?',
+          app10: 'postal', from10: 'belu.arce',  text10: '¿Hay stock de la orgánica?' },
+
   // Esc 9F · Daniel le escribe a María desde la app de mensajería
   s9F: {
     contact: 'María',

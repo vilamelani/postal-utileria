@@ -580,7 +580,7 @@ video.mirror.nomirror { transform: none; }
 .sh-sub { font-size: 12px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: #a8928a; margin: 14px 2px 2px; }
 
 /* ---------- Esc 9F: chat de la app de mensajería genérica ---------- */
-.ch { position: absolute; inset: 0; bottom: var(--kb, 0px); display: flex; flex-direction: column; background: #f3ede6; color: #111; }
+.ch { position: absolute; inset: 0; display: flex; flex-direction: column; background: #f3ede6; color: #111; }
 .ch-top { display: flex; align-items: center; gap: 10px; padding: 4px 10px 9px 6px; background: #fff; border-bottom: .5px solid rgba(0,0,0,.12); }
 .ch-back svg { width: 26px; height: 26px; stroke: #0e8d9d; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; display: block; }
 .ch-and .ch-back svg { stroke: #222; }
@@ -605,6 +605,7 @@ video.mirror.nomirror { transform: none; }
 .ch-bar { display: flex; align-items: flex-end; gap: 8px; padding: 7px 8px calc(8px + env(safe-area-inset-bottom)); background: #fff; border-top: .5px solid rgba(0,0,0,.1); }
 #phone:not(.real-sb) .ch-bar { padding-bottom: 26px; }
 .ch.kb-open .ch-bar { padding-bottom: 8px !important; }
+.ch.kb-open .ch-top { padding-top: 8px; }
 .ch-plus { width: 34px; height: 38px; display: grid; place-items: center; }
 .ch-plus svg { width: 24px; height: 24px; stroke: #0e8d9d; fill: none; stroke-width: 2; stroke-linecap: round; }
 .ch-field { flex: 1; background: #fff; border: .5px solid rgba(0,0,0,.14); border-radius: 20px; padding: 8px 14px; min-height: 38px; display: flex; align-items: center; }

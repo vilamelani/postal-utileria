@@ -857,16 +857,30 @@
       inp.value = ''; sync();
       later(() => { const e = m.querySelector('em'); if (e) e.innerHTML = `${hh} ${check2}`; }, 1100);
     });
-    // teclado del celular: la barra de escribir queda pegada arriba del teclado
+    // teclado del iPhone: iOS achica y corre la parte visible de la pantalla. El chat se pega a esa parte visible
+    // (arriba el encabezado, abajo la barra de escribir justo sobre el teclado) en vez de dejar que se corra hacia arriba.
     const vv = window.visualViewport;
     const fit = () => {
       if (!root.isConnected) { if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); } return; }
-      const kb = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
-      root.style.setProperty('--kb', kb + 'px');
-      root.classList.toggle('kb-open', kb > 0);
-      if (kb > 0) window.scrollTo(0, 0);
+      const kb = vv ? Math.max(0, window.innerHeight - vv.height) : 0;
+      const open = kb > 80;
+      root.classList.toggle('kb-open', open);
+      if (open) {
+        root.style.position = 'fixed';
+        root.style.top = vv.offsetTop + 'px';
+        root.style.left = vv.offsetLeft + 'px';
+        root.style.width = vv.width + 'px';
+        root.style.height = vv.height + 'px';
+        root.style.bottom = 'auto';
+        root.style.zIndex = '20';
+      } else {
+        ['position', 'top', 'left', 'width', 'height', 'bottom', 'zIndex'].forEach((k) => { root.style[k] = ''; });
+        if (window.scrollY) window.scrollTo(0, 0);
+      }
       body.scrollTop = body.scrollHeight;
     };
+    inp.addEventListener('focus', () => { setTimeout(fit, 50); setTimeout(fit, 350); });
+    inp.addEventListener('blur', () => setTimeout(fit, 150));
     if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); }
     body.scrollTop = body.scrollHeight;
   }

@@ -443,13 +443,13 @@ svg { display: block; }
 .rl-top svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .rl-top .rl-cam { margin-left: auto; }
 .rl-top .rl-cam svg { width: 26px; height: 26px; stroke-width: 1.8; }
-.rl-rail { position: absolute; right: 8px; bottom: 82px; display: flex; flex-direction: column; align-items: center; gap: 18px; z-index: 2; }
+.rl-rail { position: absolute; right: 8px; bottom: var(--rl-b); display: flex; flex-direction: column; align-items: center; gap: 18px; z-index: 2; }
 .rl-rail span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .rl-rail svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
 .rl-rail span.liked svg { fill: #ff3040; stroke: #ff3040; }
 .rl-rail em { font-style: normal; }
 .rl-rail .rl-disc { width: 28px; height: 28px; border-radius: 7px; border: 2px solid #fff; background-size: cover; background-position: center; }
-.rl-info { position: absolute; left: 14px; right: 70px; bottom: 82px; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.rl-info { position: absolute; left: 14px; right: 70px; bottom: var(--rl-b); z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .rl-user { display: flex; align-items: center; gap: 9px; font-size: 14.5px; }
 .rl-user img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
 .rl-follow { border: 1px solid rgba(255,255,255,.8); border-radius: 8px; padding: 3px 10px; font-weight: 600; font-size: 13.5px; }
@@ -462,6 +462,9 @@ svg { display: block; }
 .rl-heart.pop { animation: pop .9s ease-out; }
 @keyframes pop { 0% { transform: translate(-50%,-50%) scale(0); opacity: 0; } 15% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; } 30% { transform: translate(-50%,-50%) scale(.95); } 70% { opacity: 1; } 100% { transform: translate(-50%,-62%) scale(1); opacity: 0; } }
 .reel .p-nav { position: relative; z-index: 2; margin-top: auto; }
+/* distancia del texto y los íconos del reel a la barra de abajo (alto de la barra + aire), según haya o no zona segura del iPhone */
+.reel { --rl-b: calc(51px + env(safe-area-inset-bottom) + 18px); }
+#phone:not(.real-sb):not(.no-chrome) .reel { --rl-b: calc(51px + 20px + 18px); }
 
 /* Cámara */
 .cam, .lv { position: absolute; inset: 0; background: #111; color: #fff; overflow: hidden; }

@@ -961,7 +961,7 @@
           <span class="rl-disc" style="background-image:url('${img('micaAvatar')}')"></span>
         </div>
         <div class="rl-info">
-          <div class="rl-user"><img src="${img('micaAvatar')}" alt=""><b>${esc(S.mica.username)}</b><span class="rl-follow">Seguir</span></div>
+          <div class="rl-user"><img src="${img('micaAvatar')}" alt=""><b>${esc(S.mica.username)}</b></div>
           <div class="rl-cap">${esc(c.caption)} <span>… más</span></div>
           <div class="rl-audio">${I.music}<span>${esc(S.mica.username)} · Audio original</span></div>
         </div>

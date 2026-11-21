@@ -322,7 +322,7 @@
   const camOnPlus = (r = route) => r === '38B' || r === '38C';
   /* 38: la cámara se enciende al entrar (permiso seguro). 38B: recién al tocar “+” (perfil sin avisos de iPhone) */
   const camOnEnter = () => route === '38' && !!S.s38.askCameraOnEnter;
-  const isBusy = () => (['9B', '9E', '9E2', '9H', '17', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || route === '9F' || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
+  const isBusy = () => (!(route === '21' && R.sub['21'] === 'reel') && ['9B', '9E', '9E2', '9H', '17', '21', '36', '36B', '39', '41'].includes(route) && R.sub[route] !== 'arm') || route === '9F' || (is38() && R.sub['38'] === 'live') || route === '40' || route === '43';
 
   /* =======================================================================
      Menú de escenas (equipo)
@@ -1451,8 +1451,8 @@
           ${r === '36B' ? row('Nombre del remitente', txt('s36B.sender')) + row('Nombre de la app de chat', txt('s36B.appLabel'), 'Se ve en Android') + row('Primer mensaje', txt('s36B.text1')) + row('Segundo mensaje', txt('s36B.text2')) + row('Segundos entre mensajes', txt('s36B.gapSec', 'number', 'min="0.3" step="0.5"')) + row('Bajar fecha, hora y mensajes', txt('s36B.offset', 'number', 'min="0" max="200" step="5"'), 'En píxeles (0 = posición normal)') : ''}
           ${r === '9E2' ? row('Cuántas notificaciones', txt('s9E2.count', 'number', 'min="1" max="10" step="1"'), 'Hasta 10. Las del guion son la 7 y la 8') : ''}
           ${r === '9B' || r === '9E' || r === '9E2' ? Array.from({ length: n9(S[k]) }, (_, j) => j + 1).map((i) => `<div class="sh-sub">Notificación ${i}</div>` + row('Viene de', seg(`${k}.app${i}`, [['postal', esc(S.appName)], ['chat', 'Mensajería']])) + row('Quién escribe', txt(`${k}.from${i}`)) + row('Texto', txt(`${k}.text${i}`))).join('') + row('Segundos entre una y otra', txt(`${k}.gapSec`, 'number', 'min="0.2" step="0.1"')) + row('Nombre de la app de mensajería', txt(`${k}.chatLabel`), 'Se ve en Android') : ''}
-          ${r !== '9H' && r !== '41' && r !== '36B' && r !== '9B' && r !== '9E' && r !== '9E2' ? row('Texto', txt(`${k}.text`), (r === '36' || r === '17') ? '' : '{u} = usuario de Mica') : ''}
-          ${r === '21' ? vidRow('Video del reel', 'reel21') : ''}
+          ${r !== '9H' && r !== '41' && r !== '36B' && r !== '9B' && r !== '9E' && r !== '9E2' ? row(r === '21' ? 'Texto de la notificación' : 'Texto', txt(`${k}.text`), (r === '36' || r === '17') ? '' : '{u} = usuario de Mica') : ''}
+          ${r === '21' ? `<div class="sh-sub">Reel que se abre al tocar la notificación</div>` + vidRow('Video del reel', 'reel21') + row('Texto del reel', txt('s21.caption')) + row('Me gusta', txt('s21.likes')) + row('Comentarios', txt('s21.comments')) + row('Compartidos', txt('s21.shares')) + `<button type="button" class="sh-wide" data-act="open21">Abrir el reel ya</button>` : ''}
         </div>`;
     }
     if (r === '15') {
@@ -1463,6 +1463,7 @@
           ${row('Texto', txt('s15.caption'))}
           ${row('Me gusta', txt('s15.likes'))}
           ${row('Comentarios', txt('s15.comments'))}
+          ${row('Compartidos', txt('s15.shares'))}
           <button type="button" class="sh-wide hot" data-act="reset-scene">Reiniciar escena</button>
         </div>`;
     }
@@ -1619,6 +1620,7 @@
       case 'phase2': LV.p3t0 = 0; setPhase(2); break;
       case 'phase3': setPhase(3); break;
       case 'mute': setMute(!LV.muted); renderSheet(); break;
+      case 'open21': R.sub['21'] = 'reel'; render(); closeSheet(); break;
       case 'open17': R.sub['17'] = 'chat'; render(); closeSheet(); break;
       case 'camtoggle': setCamOff(!LV.camOff); renderSheet(); break;
       case 'askcam': ensureCam().then((s) => {

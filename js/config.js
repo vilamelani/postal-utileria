@@ -114,6 +114,10 @@ window.GUITA_DEFAULTS = {
   // Esc 15 · Ariel mira un video de skincare
   s15: { caption: 'Mi rutina de skincare de noche 🌙✨', likes: '12,4 mil', comments: '348', shares: '1.203' },   // [INVENTADO]
 
+  // Esc 17 · A Rodrigo le llega un mensaje (app de mensajería genérica); al tocar la notificación se abre el chat
+  s17: { start: 'lock', trigger: 'both', delay: 5, sender: 'Lu', appLabel: 'Chat', status: 'en línea',   // remitente y estado: [INVENTADO]
+         text: 'Conseguí otro que sale 950 por mes. Pero para reservar ya, hay que dejar seña' },
+
   // Esc 21 · Notificación "Micar ha publicado un nuevo video" → al tocarla se abre el reel
   s21: {
     start: 'lock', trigger: 'both', delay: 6,

@@ -20,6 +20,7 @@ Es una web app: se abre en el navegador del celular, se instala en la pantalla d
 | Escena | Qué muestra | Cómo se usa |
 |---|---|---|
 | **15** | Reel de skincare de micarr en pantalla completa | Se abre y el video arranca solo (sin sonido: el audio va en post). Ariel bloquea el celular con el botón real |
+| **17** | Celular de Rodrigo: pantalla bloqueada → mensaje “Conseguí otro que sale 950 por mes. Pero para reservar ya, hay que dejar seña” (app de mensajería) → al tocarlo se abre el chat | **ARMAR**; llega por temporizador (5 s) o toque. Tocar la notificación abre el chat. Remitente editable en el menú oculto |
 | **21** | Pantalla bloqueada → notificación "micarr ha publicado un nuevo video" → reel | **ARMAR**; llega por temporizador o toque. Al tocar la notificación se abre el reel |
 
 ### Episodio 3

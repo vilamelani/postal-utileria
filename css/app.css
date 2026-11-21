@@ -617,3 +617,8 @@ video.mirror.nomirror { transform: none; }
 .ch-send svg { width: 24px; height: 24px; stroke: #0e8d9d; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .ch-send.on { background: #0e8d9d; }
 .ch-send.on svg { stroke: #fff; width: 20px; height: 20px; }
+
+/* 17: mensaje entrante y barra de escribir inerte */
+.ch-msg.in { align-self: flex-start; background: #fff; border-bottom-left-radius: 5px; }
+.ch-msg.in em { color: #8a807a; }
+.ch-ph { color: #9a918b; font-size: 16px; }
